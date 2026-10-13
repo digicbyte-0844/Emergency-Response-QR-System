@@ -25,6 +25,50 @@ const notifications = new NotificationService();
 const hospitals = new HospitalService();
 
 // -------------------------------------------------------------
+// Root Status Page
+// -------------------------------------------------------------
+app.get('/', (req: Request, res: Response) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ResQQR Emergency Backend API</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px 20px; text-align: center; }
+          .card { max-width: 580px; margin: 0 auto; background: #1e293b; border-radius: 20px; padding: 36px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+          .badge { display: inline-block; background: #dc2626; color: white; padding: 4px 12px; border-radius: 9999px; font-weight: bold; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+          h1 { margin: 0 0 8px; font-size: 24px; }
+          p { color: #94a3b8; font-size: 14px; line-height: 1.6; }
+          .btn { display: inline-block; background: #dc2626; color: white; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-weight: bold; font-size: 14px; margin-top: 16px; transition: background 0.2s; }
+          .btn:hover { background: #b91c1c; }
+          .status { color: #34d399; font-weight: 600; margin-top: 20px; font-size: 13px; }
+          .endpoints { text-align: left; background: #0f172a; border-radius: 12px; padding: 16px; margin-top: 20px; font-size: 12px; font-family: monospace; color: #cbd5e1; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="badge">API Service Active</div>
+          <h1>ResQQR Emergency Backend API</h1>
+          <p>The secure medical triage API is operational and serving encrypted emergency profiles.</p>
+          <div class="status">● Connected to Firebase Cloud Firestore (emergency-qr-997c0)</div>
+          <a class="btn" href="https://emergency-qr-997c0.web.app" target="_blank">Open Emergency Web App &rarr;</a>
+          <div class="endpoints">
+            <strong>Key API Endpoints:</strong><br/>
+            • GET <a href="/api/health" style="color:#60a5fa">/api/health</a> - Service health check<br/>
+            • GET <a href="/api/profiles/demo" style="color:#60a5fa">/api/profiles/demo</a> - Pre-seeded medical scenarios<br/>
+            • POST /api/profile - Encrypt and save profile<br/>
+            • GET /api/scan/:token - Decrypted emergency triage scan<br/>
+            • POST /api/scan/:token/notify-location - GPS location dispatch
+          </div>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
+// -------------------------------------------------------------
 // 1. Healthcheck Endpoint
 // -------------------------------------------------------------
 app.get('/api/health', (req: Request, res: Response) => {
