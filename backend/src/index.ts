@@ -374,6 +374,30 @@ app.post('/api/scan/:token/agora-token', async (req: Request, res: Response) => 
 });
 
 // -------------------------------------------------------------
+// 6d. Twilio Incoming Voice Webhook (Bridges Bystander to Family via Relay)
+// -------------------------------------------------------------
+app.all('/api/voice/incoming', (req: Request, res: Response) => {
+  const targetNumber = notifications.getLatestRelayTarget();
+  const twilioNumber = process.env.TWILIO_PHONE_NUMBER || req.body.To || req.query.To || '+15005550006';
+
+  res.type('text/xml');
+  if (!targetNumber) {
+    return res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">Connecting to emergency dispatch. Please hold.</Say>
+</Response>`);
+  }
+
+  return res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">Connecting encrypted emergency call. Your number is protected.</Say>
+  <Dial callerId="${twilioNumber}" timeout="30">
+    <Number>${targetNumber}</Number>
+  </Dial>
+</Response>`);
+});
+
+// -------------------------------------------------------------
 // 7. Nearby Hospitals & Emergency Clinics (Overpass API Proxy)
 // -------------------------------------------------------------
 app.get('/api/hospitals', async (req: Request, res: Response) => {

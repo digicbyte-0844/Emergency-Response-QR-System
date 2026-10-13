@@ -24,6 +24,11 @@ export class NotificationService {
   private twilioClient: any = null;
   private twilioPhone: string = '';
   private recentAlerts: EmergencyAlertLog[] = [];
+  private latestRelayTarget: string | null = null;
+
+  getLatestRelayTarget(): string | null {
+    return this.latestRelayTarget;
+  }
 
   constructor() {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -191,7 +196,8 @@ export class NotificationService {
 
     // Secure Voice Relay Mode
     const cleanNumber = (target.phone || '').replace(/[^0-9+]/g, '');
-    const proxyTelUri = (this.twilioClient && this.twilioPhone)
+    this.latestRelayTarget = cleanNumber;
+    const proxyTelUri = (this.twilioPhone && this.twilioPhone.length > 5)
       ? `tel:${this.twilioPhone}`
       : `tel:${cleanNumber}`;
 
