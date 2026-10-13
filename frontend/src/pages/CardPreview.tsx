@@ -6,13 +6,8 @@ import { PublicEmergencyProfile } from '../types';
 import { 
   Printer, 
   ArrowLeft, 
-  ShieldCheck, 
-  HeartPulse, 
-  Download, 
   Smartphone, 
-  Check,
-  Phone,
-  AlertTriangle
+  ShieldCheck 
 } from 'lucide-react';
 
 export const CardPreview: React.FC = () => {
@@ -29,7 +24,7 @@ export const CardPreview: React.FC = () => {
         setPatient(data);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch(() => {
         setError('Failed to load card profile');
         setLoading(false);
       });
@@ -40,13 +35,13 @@ export const CardPreview: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-slate-500">Preparing high-resolution printable card...</div>;
+    return <div className="p-12 text-center text-slate-500 text-xs">Preparing printable medical card...</div>;
   }
 
   if (error || !patient || !token) {
     return (
-      <div className="p-12 text-center text-red-600">
-        Medical card not found. <Link to="/dashboard" className="underline font-bold">Return to dashboard</Link>
+      <div className="p-12 text-center text-red-600 text-xs">
+        Medical card not found. <Link to="/dashboard" className="underline font-semibold">Return to dashboard</Link>
       </div>
     );
   }
@@ -56,142 +51,140 @@ export const CardPreview: React.FC = () => {
   const secondaryContact = patient.emergencyContacts.find((c) => !c.isPrimary);
 
   return (
-    <div className="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6">
+      <div className="max-w-3xl mx-auto space-y-6">
         
-        {/* Controls - Hidden during print */}
-        <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        {/* Header - Hidden during print */}
+        <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
           <div>
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 mb-2"
+              className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-800 mb-1"
             >
-              <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+              <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
             </Link>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              Printable Emergency Wallet Card & Badge
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              Printable Medical ID Card
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Standard ISO/IEC 7810 ID-1 card dimensions (85.6mm x 54mm) ready for wallet, lanyard, or backpack.
+            <p className="text-xs text-slate-500">
+              Standard wallet card size (85.6mm × 54mm). Cut along the dotted line after printing.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-2xl shadow-md transition text-xs uppercase tracking-wider"
+              className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2.5 rounded-lg transition text-xs shadow-xs"
             >
               <Printer className="w-4 h-4" />
-              <span>Print Wallet Card (A4/Letter)</span>
+              <span>Print Wallet Card</span>
             </button>
           </div>
         </div>
 
-        {/* Printable Card Preview Container */}
-        <div className="print-card-container space-y-8">
+        {/* Printable Card Container */}
+        <div className="print-card-container space-y-6">
           <div className="text-center no-print">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-              Cut along dotted lines after printing
+            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              Front & Back Card Preview
             </span>
           </div>
 
-          {/* Cards Flex Container (Front and Back side-by-side or stacked) */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+          {/* Cards Front & Back */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             
             {/* FRONT OF CARD */}
-            <div className="w-[340px] h-[214px] bg-white rounded-2xl border-2 border-dashed border-slate-400 p-4 shadow-lg flex flex-col justify-between relative overflow-hidden select-none">
-              {/* Header Bar */}
+            <div className="w-[340px] h-[214px] bg-white rounded-xl border border-dashed border-slate-300 p-4 shadow-sm flex flex-col justify-between relative overflow-hidden select-none">
+              {/* Header */}
               <div className="flex items-center justify-between border-b border-red-500 pb-2">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-md bg-red-600 text-white flex items-center justify-center font-black text-sm">
+                  <div className="w-5 h-5 rounded bg-red-600 text-white flex items-center justify-center font-bold text-xs">
                     ✚
                   </div>
-                  <span className="font-black text-xs text-red-600 tracking-wider uppercase">
+                  <span className="font-bold text-xs text-red-600 tracking-wide uppercase">
                     EMERGENCY MEDICAL ID
                   </span>
                 </div>
-                <div className="bg-red-100 text-red-700 font-black text-xs px-2 py-0.5 rounded">
-                  {patient.bloodType}
+                <div className="bg-red-50 text-red-700 border border-red-200 font-bold text-xs px-2 py-0.5 rounded">
+                  Blood {patient.bloodType}
                 </div>
               </div>
 
-              {/* Patient Core Info */}
-              <div className="my-auto space-y-1">
+              {/* Core Information */}
+              <div className="my-auto space-y-1.5">
                 <div className="flex items-baseline justify-between">
-                  <h3 className="font-black text-base text-slate-900 leading-tight">
+                  <h3 className="font-bold text-base text-slate-900 leading-tight">
                     {patient.fullName}
                   </h3>
-                  <span className="text-[10px] text-slate-500 font-semibold">
+                  <span className="text-[10px] text-slate-500 font-medium">
                     {patient.age ? `${patient.age} yrs` : ''} {patient.gender ? `• ${patient.gender}` : ''}
                   </span>
                 </div>
 
                 {patient.allergies && patient.allergies.length > 0 && (
                   <div className="text-[11px] bg-red-50 text-red-800 p-1.5 rounded border border-red-200">
-                    <span className="font-black uppercase text-[9px] block text-red-600">Allergies:</span>
-                    <span className="font-bold truncate block">{patient.allergies.join(', ')}</span>
+                    <span className="font-bold uppercase text-[9px] block text-red-700">Allergies:</span>
+                    <span className="font-semibold truncate block">{patient.allergies.join(', ')}</span>
                   </div>
                 )}
 
                 {patient.chronicConditions && patient.chronicConditions.length > 0 && (
-                  <div className="text-[10px] text-slate-600 font-semibold truncate">
+                  <div className="text-[10px] text-slate-600 font-medium truncate">
                     <strong>Conditions:</strong> {patient.chronicConditions.join(', ')}
                   </div>
                 )}
               </div>
 
-              {/* Bottom Emergency Contact */}
-              <div className="border-t border-slate-200 pt-2 flex items-center justify-between text-[10px]">
+              {/* Contact Footer */}
+              <div className="border-t border-slate-200 pt-1.5 flex items-center justify-between text-[10px]">
                 {primaryContact ? (
                   <div>
-                    <span className="font-bold text-slate-500 uppercase text-[9px] block">Emergency Contact:</span>
-                    <span className="font-black text-slate-900">{primaryContact.name} ({primaryContact.relationship})</span>
-                    <span className="font-bold text-red-600 block">{primaryContact.phone}</span>
+                    <span className="font-semibold text-slate-500 uppercase text-[9px] block">Emergency Contact:</span>
+                    <span className="font-bold text-slate-900">{primaryContact.name} ({primaryContact.relationship})</span>
+                    <span className="font-semibold text-red-600 block">{primaryContact.phone}</span>
                   </div>
                 ) : (
                   <span className="text-slate-400">Call 911 / 112</span>
                 )}
-                <span className="text-[9px] font-bold text-slate-400 uppercase">FRONT</span>
+                <span className="text-[9px] font-semibold text-slate-400 uppercase">FRONT</span>
               </div>
             </div>
 
             {/* BACK OF CARD */}
-            <div className="w-[340px] h-[214px] bg-white rounded-2xl border-2 border-dashed border-slate-400 p-4 shadow-lg flex flex-col justify-between relative overflow-hidden select-none">
-              {/* Header */}
+            <div className="w-[340px] h-[214px] bg-white rounded-xl border border-dashed border-slate-300 p-4 shadow-sm flex flex-col justify-between relative overflow-hidden select-none">
               <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-                <span className="font-bold text-[10px] uppercase tracking-wider text-slate-500">
-                  SCAN FOR RESCUE PROTOCOL
+                <span className="font-semibold text-[10px] uppercase tracking-wide text-slate-600">
+                  SCAN FOR MEDICAL DETAILS
                 </span>
-                <span className="text-[9px] font-bold text-slate-400 uppercase">BACK</span>
+                <span className="text-[9px] font-semibold text-slate-400 uppercase">BACK</span>
               </div>
 
               {/* QR and Instructions */}
               <div className="my-auto flex items-center gap-3">
-                <div className="bg-slate-50 p-1.5 rounded-xl border border-slate-200 shrink-0">
+                <div className="bg-white p-1 rounded-lg border border-slate-200 shrink-0">
                   <QRCodeSVG
                     value={scanUrl}
-                    size={90}
+                    size={84}
                     level="H"
                     includeMargin={false}
                   />
                 </div>
                 <div className="space-y-1 text-[10px] text-slate-600 leading-tight">
                   <p className="font-bold text-red-600 uppercase text-[10px]">
-                    SCAN WITH ANY PHONE CAMERA
+                    SCAN WITH ANY SMARTPHONE CAMERA
                   </p>
                   <p>
-                    Reveals full medical history, active medications, doctor contact, and automatically alerts emergency contacts.
+                    Instant access to complete vitals, active medications, doctor info, and location beacon.
                   </p>
                   {secondaryContact && (
-                    <p className="pt-1 text-[9px] text-slate-500">
+                    <p className="pt-0.5 text-[9px] text-slate-500">
                       <strong>Secondary:</strong> {secondaryContact.name} ({secondaryContact.phone})
                     </p>
                   )}
                 </div>
               </div>
 
-              {/* Card Footer */}
-              <div className="border-t border-slate-200 pt-1.5 flex items-center justify-between text-[9px] text-slate-400 font-semibold">
+              <div className="border-t border-slate-200 pt-1 flex items-center justify-between text-[9px] text-slate-400 font-medium">
                 <span>ResQQR Medical Protocol</span>
                 <span>Encrypted • AES-256</span>
               </div>
@@ -199,33 +192,34 @@ export const CardPreview: React.FC = () => {
 
           </div>
 
-          {/* Wallet / Phone Lockscreen Guide - Hidden during print */}
-          <div className="no-print bg-white p-6 rounded-3xl border border-slate-200 text-xs text-slate-600 space-y-3">
-            <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-red-600" />
-              Ways to carry your Emergency QR:
+          {/* Tips - Hidden during print */}
+          <div className="no-print bg-white p-5 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2.5 shadow-xs">
+            <h4 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-slate-600" />
+              Usage Tips:
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="font-bold text-slate-800 mb-1">1. Wallet Card</p>
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="font-semibold text-slate-800 mb-0.5">1. Wallet Card</p>
                 <p className="text-[11px] text-slate-500">
-                  Print on heavy cardstock or laminate, cut along the borders, and place behind your ID.
+                  Print on standard paper or cardstock, cut along lines, and place in wallet.
                 </p>
               </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="font-bold text-slate-800 mb-1">2. Clear Phone Case</p>
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="font-semibold text-slate-800 mb-0.5">2. Clear Phone Case</p>
                 <p className="text-[11px] text-slate-500">
-                  Slip the printed QR code behind your clear smartphone case so it's always visible even if the phone battery dies.
+                  Slip behind a clear phone case so it's always accessible even if battery dies.
                 </p>
               </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <p className="font-bold text-slate-800 mb-1">3. Helmet / Backpack Sticker</p>
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="font-semibold text-slate-800 mb-0.5">3. Backpack / Gear</p>
                 <p className="text-[11px] text-slate-500">
-                  Essential for cyclists, runners, motorcyclists, hikers, and children.
+                  Great for running belts, cycling helmets, gym bags, and school backpacks.
                 </p>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

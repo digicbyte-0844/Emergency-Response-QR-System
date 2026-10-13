@@ -114,10 +114,10 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ profile, languag
   return (
     <button
       onClick={handleSpeak}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition shadow-xs ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
         speaking
-          ? 'bg-amber-400 text-slate-950 animate-pulse'
-          : 'bg-white/20 hover:bg-white/30 text-white'
+          ? 'bg-red-600 text-white'
+          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
       }`}
       title="Audio voice readout of emergency vitals"
     >
