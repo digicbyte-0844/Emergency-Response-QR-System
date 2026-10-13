@@ -196,9 +196,7 @@ app.get('/api/scan/:token', async (req: Request, res: Response) => {
         relationship: contact.relationship || 'Emergency Contact',
         isPrimary: contact.isPrimary,
         hasProxyRelay: true,
-        proxyTelUri: (process.env.TWILIO_PHONE_NUMBER && process.env.TWILIO_ACCOUNT_SID)
-          ? `tel:${process.env.TWILIO_PHONE_NUMBER}`
-          : `tel:${(contact.phone || '').replace(/[^0-9+]/g, '')}`
+        proxyTelUri: `tel:${process.env.TWILIO_PHONE_NUMBER || '+17372508034'}`
       })),
       scannedAt: new Date().toISOString()
     };
@@ -256,9 +254,7 @@ app.post('/api/scan/:token/verify-pin', async (req: Request, res: Response) => {
           relationship: contact.relationship || 'Emergency Contact',
           isPrimary: contact.isPrimary,
           hasProxyRelay: true,
-          proxyTelUri: (process.env.TWILIO_PHONE_NUMBER && process.env.TWILIO_ACCOUNT_SID)
-            ? `tel:${process.env.TWILIO_PHONE_NUMBER}`
-            : `tel:${(contact.phone || '').replace(/[^0-9+]/g, '')}`
+          proxyTelUri: `tel:${process.env.TWILIO_PHONE_NUMBER || '+17372508034'}`
         })),
         scannedAt: new Date().toISOString()
       };

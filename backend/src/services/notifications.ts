@@ -33,7 +33,7 @@ export class NotificationService {
   constructor() {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
-    this.twilioPhone = process.env.TWILIO_PHONE_NUMBER || '+15005550006';
+    this.twilioPhone = process.env.TWILIO_PHONE_NUMBER || '+17372508034';
 
     if (accountSid && authToken && !accountSid.includes('your-') && !authToken.includes('your-')) {
       try {

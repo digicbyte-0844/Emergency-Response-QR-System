@@ -675,7 +675,7 @@ export const ScanView: React.FC = () => {
       {primaryContact?.proxyTelUri && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl z-40 max-w-md mx-auto">
           <a
-            href={`tel:%2331%23${primaryContact.proxyTelUri.replace('tel:', '')}`}
+            href={primaryContact.proxyTelUri}
             onClick={() => {
               if (token) api.callEmergencyContact(token, primaryContact.id).catch(() => {});
             }}
