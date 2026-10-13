@@ -754,49 +754,62 @@ export const ScanView: React.FC = () => {
 
       </div>
 
-      {/* Sticky Bottom Calling Bar - Encrypted Voice Relay */}
+      {/* Sticky Bottom Calling Bar - Direct Emergency Call & Encrypted Relay */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-3 shadow-lg z-40 max-w-md mx-auto">
         <div className="space-y-2">
-          {/* Primary Action: In-Browser Encrypted WebRTC Voice Call (Agora RTC) */}
-          <button
-            onClick={handleStartAgoraCall}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-3.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-md cursor-pointer text-center"
-          >
-            <FontAwesomeIcon icon={faHeadset} />
-            <span>Start Encrypted Voice Call ({primaryContact?.relationship || 'Contact'})</span>
-          </button>
+          {/* 1. PRIMARY ACTION: Direct Cellular Phone Call (Rings the actual phone immediately) */}
+          {primaryContact?.proxyTelUri && (
+            <a
+              href={primaryContact.proxyTelUri}
+              onClick={() => {
+                if (token) api.callEmergencyContact(token, primaryContact.id).catch(() => {});
+              }}
+              className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-md cursor-pointer text-center"
+            >
+              <FontAwesomeIcon icon={faPhone} />
+              <span>Call Emergency Contact ({primaryContact.relationship || 'Primary'})</span>
+            </a>
+          )}
 
-          {/* Privacy & Fallback Direct Options */}
+          {/* Privacy & Alternate Options */}
           <div className="flex items-center justify-between px-1 text-[11px]">
             {primaryContact?.proxyTelUri ? (
               <a
-                href={primaryContact.proxyTelUri}
-                onClick={() => {
-                  if (token) api.callEmergencyContact(token, primaryContact.id).catch(() => {});
-                }}
-                className="text-slate-600 hover:text-slate-900 font-medium underline"
-                title="Dial via cellular phone app"
+                href={`tel:%2331%23${primaryContact.proxyTelUri.replace('tel:', '')}`}
+                className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-semibold"
+                title="Dial with #31# prefix to conceal caller ID on the recipient's phone"
               >
-                Or dial cellular network
+                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
+                <span>Call with Private Caller ID (#31#)</span>
               </a>
             ) : (
-              <span className="text-slate-500">End-to-End Encrypted</span>
+              <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
+                <span>Caller ID Masked & Encrypted</span>
+              </span>
             )}
-
-            <span className="flex items-center gap-1 text-emerald-700 font-semibold">
-              <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
-              <span>Zero Numbers Shared</span>
-            </span>
 
             {secondaryContact?.proxyTelUri && (
               <a
                 href={secondaryContact.proxyTelUri}
+                onClick={() => {
+                  if (token) api.callEmergencyContact(token, secondaryContact.id).catch(() => {});
+                }}
                 className="text-slate-700 hover:text-slate-900 font-semibold hover:underline cursor-pointer"
               >
-                Secondary ({secondaryContact.relationship})
+                Call Secondary ({secondaryContact.relationship})
               </a>
             )}
           </div>
+
+          {/* 2. OPTIONAL: In-Browser Web Voice Call via Agora (Zero numbers used) */}
+          <button
+            onClick={handleStartAgoraCall}
+            className="w-full bg-slate-900 hover:bg-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition border border-slate-700 cursor-pointer text-center"
+          >
+            <FontAwesomeIcon icon={faHeadset} className="text-emerald-400" />
+            <span>Or Start In-Browser WebRTC Voice Call (Agora Audio)</span>
+          </button>
         </div>
       </div>
 
