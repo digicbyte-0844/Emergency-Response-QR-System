@@ -178,19 +178,25 @@ export class NotificationService {
       }
     }
 
-    // Simulator / Privacy Masked Relay Mode
+    // Secure Voice Relay Mode
+    const cleanNumber = (target.phone || '').replace(/[^0-9+]/g, '');
+    const proxyTelUri = (this.twilioClient && this.twilioPhone)
+      ? `tel:${this.twilioPhone}`
+      : `tel:${cleanNumber}`;
+
     const maskedNumber = target.phone ? target.phone.slice(-4).padStart(target.phone.length, '•') : '••••••••';
     console.log(`\n================== [ENCRYPTED CALL RELAY - CALLER ID MASKED] ==================`);
     console.log(`Patient: ${profile.fullName}`);
     console.log(`Relay Target: ${target.relationship} [${maskedNumber}]`);
+    console.log(`Proxy URI: ${proxyTelUri}`);
     console.log(`Status: Connecting bystander via private voice proxy. Real phone number is hidden.`);
     console.log(`================================================================================\n`);
 
     return {
       success: true,
       message: `Encrypted voice relay connecting to emergency contact (${target.relationship}). Private numbers are 100% masked.`,
-      proxyTelUri: undefined,
-      simulated: true
+      proxyTelUri,
+      simulated: isSimulated
     };
   }
 }

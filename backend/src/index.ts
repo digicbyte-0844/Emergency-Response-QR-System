@@ -191,11 +191,12 @@ app.get('/api/scan/:token', async (req: Request, res: Response) => {
       isUnlocked: !isProtected,
       emergencyContacts: (profile.emergencyContacts || []).map((contact) => ({
         id: contact.id,
-        name: contact.name,
         relationship: contact.relationship || 'Emergency Contact',
-        phone: contact.phone,
         isPrimary: contact.isPrimary,
-        hasProxyRelay: true
+        hasProxyRelay: true,
+        proxyTelUri: (process.env.TWILIO_PHONE_NUMBER && process.env.TWILIO_ACCOUNT_SID)
+          ? `tel:${process.env.TWILIO_PHONE_NUMBER}`
+          : `tel:${(contact.phone || '').replace(/[^0-9+]/g, '')}`
       })),
       scannedAt: new Date().toISOString()
     };
@@ -250,11 +251,12 @@ app.post('/api/scan/:token/verify-pin', async (req: Request, res: Response) => {
         isUnlocked: true,
         emergencyContacts: (profile.emergencyContacts || []).map((contact) => ({
           id: contact.id,
-          name: contact.name,
           relationship: contact.relationship || 'Emergency Contact',
-          phone: contact.phone,
           isPrimary: contact.isPrimary,
-          hasProxyRelay: true
+          hasProxyRelay: true,
+          proxyTelUri: (process.env.TWILIO_PHONE_NUMBER && process.env.TWILIO_ACCOUNT_SID)
+            ? `tel:${process.env.TWILIO_PHONE_NUMBER}`
+            : `tel:${(contact.phone || '').replace(/[^0-9+]/g, '')}`
         })),
         scannedAt: new Date().toISOString()
       };

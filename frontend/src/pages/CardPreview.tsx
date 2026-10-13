@@ -148,8 +148,8 @@ export const CardPreview: React.FC = () => {
                 {primaryContact ? (
                   <div>
                     <span className="font-semibold text-slate-500 uppercase text-[9px] block">Emergency Contact:</span>
-                    <span className="font-bold text-slate-900">{primaryContact.name || primaryContact.relationship}</span>
-                    <span className="font-bold text-red-600 block text-[9px]">{primaryContact.phone || 'Scan to Call'}</span>
+                    <span className="font-bold text-slate-900">{primaryContact.relationship}</span>
+                    <span className="font-semibold text-emerald-700 block text-[9px]">Private Relay (Scan to Call)</span>
                   </div>
                 ) : (
                   <span className="text-slate-400">Emergency Voice Relay</span>
@@ -186,7 +186,7 @@ export const CardPreview: React.FC = () => {
                   </p>
                   {secondaryContact && (
                     <p className="pt-0.5 text-[9px] text-slate-500">
-                      <strong>Secondary:</strong> {secondaryContact.name || secondaryContact.relationship} {secondaryContact.phone ? `(${secondaryContact.phone})` : ''}
+                      <strong>Secondary:</strong> {secondaryContact.relationship} (Private Relay)
                     </p>
                   )}
                 </div>

@@ -52,11 +52,10 @@ export interface PublicEmergencyProfile {
   isUnlocked?: boolean;
   emergencyContacts: {
     id: string;
-    name?: string;
     relationship: string;
-    phone?: string;
     isPrimary: boolean;
     hasProxyRelay: boolean;
+    proxyTelUri?: string;
   }[];
   scannedAt: string;
 }
