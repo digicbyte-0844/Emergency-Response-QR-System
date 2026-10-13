@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeHigh, faVolumeXmark } from '@fortawesome/free-solid-svg-icons';
 import { PublicEmergencyProfile } from '../types';
 import { SupportedLanguage, TRANSLATIONS } from '../utils/translations';
 
@@ -50,7 +51,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ profile, languag
         ? `Condiciones médicas: ${profile.chronicConditions.join(', ')}.`
         : '';
       const notesText = profile.criticalNotes ? `Nota de emergencia: ${profile.criticalNotes}` : '';
-      const contactText = primaryContact ? `Contacto de emergencia: ${primaryContact.name}, teléfono ${primaryContact.phone}.` : '';
+      const contactText = primaryContact ? 'Contacto de emergencia registrado y disponible a través del relé seguro.' : '';
 
       textToSpeak = `Informe médico de emergencia para ${profile.fullName}. Grupo sanguíneo: ${profile.bloodType}. ${allergyText} ${condText} ${notesText} ${contactText}`;
     } else if (language === 'fr') {
@@ -61,7 +62,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ profile, languag
         ? `Affections chroniques: ${profile.chronicConditions.join(', ')}.`
         : '';
       const notesText = profile.criticalNotes ? `Consigne d'urgence: ${profile.criticalNotes}` : '';
-      const contactText = primaryContact ? `Contact d'urgence: ${primaryContact.name}, téléphone ${primaryContact.phone}.` : '';
+      const contactText = primaryContact ? 'Contact d\'urgence enregistré disponible par relais vocal sécurisé.' : '';
 
       textToSpeak = `Rapport médical d'urgence pour ${profile.fullName}. Groupe sanguin: ${profile.bloodType}. ${allergyText} ${condText} ${notesText} ${contactText}`;
     } else if (language === 'zh') {
@@ -72,14 +73,14 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ profile, languag
         ? `慢性疾病: ${profile.chronicConditions.join(', ')}。`
         : '';
       const notesText = profile.criticalNotes ? `急救说明: ${profile.criticalNotes}` : '';
-      const contactText = primaryContact ? `紧急联系人: ${primaryContact.name}，电话 ${primaryContact.phone}。` : '';
+      const contactText = primaryContact ? '紧急联系人已配置，可通过隐私加密通话联系。' : '';
 
       textToSpeak = `患者 ${profile.fullName} 的紧急医疗信息。血型：${profile.bloodType}。${allergyText} ${condText} ${notesText} ${contactText}`;
     } else if (language === 'hi') {
       const allergyText = profile.allergies && profile.allergies.length > 0
         ? `गंभीर एलर्जी: ${profile.allergies.join(', ')}.`
         : 'कोई ज्ञात एलर्जी नहीं.';
-      const contactText = primaryContact ? `आपातकालीन संपर्क: ${primaryContact.name}, फ़ोन नंबर ${primaryContact.phone}.` : '';
+      const contactText = primaryContact ? 'आपातकालीन संपर्क सुरक्षित एन्क्रिप्टेड रिले के माध्यम से उपलब्ध है।' : '';
 
       textToSpeak = `रोगी ${profile.fullName} के लिए आपातकालीन रिपोर्ट। रक्त समूह: ${profile.bloodType}। ${allergyText} ${contactText}`;
     } else {
@@ -91,7 +92,7 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ profile, languag
         ? `Medical conditions: ${profile.chronicConditions.join(', ')}.`
         : '';
       const notesText = profile.criticalNotes ? `Emergency notes: ${profile.criticalNotes}` : '';
-      const contactText = primaryContact ? `Primary emergency contact is ${primaryContact.name}, phone ${primaryContact.phone}.` : '';
+      const contactText = primaryContact ? 'Emergency contact is registered and protected via encrypted voice relay.' : '';
 
       textToSpeak = `Emergency medical report for ${profile.fullName}. Blood type: ${profile.bloodType}. ${allergyText} ${condText} ${notesText} ${contactText}`;
     }
@@ -116,12 +117,12 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ profile, languag
       onClick={handleSpeak}
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
         speaking
-          ? 'bg-red-600 text-white'
+          ? 'bg-red-600 text-white shadow-xs'
           : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
       }`}
       title="Audio voice readout of emergency vitals"
     >
-      {speaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+      <FontAwesomeIcon icon={speaking ? faVolumeXmark : faVolumeHigh} className="text-xs" />
       <span>{speaking ? t.voiceStop : t.voiceReadout}</span>
     </button>
   );

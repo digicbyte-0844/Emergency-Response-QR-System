@@ -2,7 +2,13 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { HospitalFacility } from '../types';
-import { Navigation, Phone, MapPin, Building2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faLocationArrow, 
+  faPhone, 
+  faHospital, 
+  faLocationDot 
+} from '@fortawesome/free-solid-svg-icons';
 
 interface HospitalMapProps {
   bystanderLat: number;
@@ -13,7 +19,7 @@ interface HospitalMapProps {
 
 const userLocationIcon = L.divIcon({
   className: 'custom-user-marker',
-  html: `<div style="width:20px; height:20px; background:#2563eb; border:2.5px solid white; border-radius:50%; box-shadow:0 0 6px rgba(37,99,235,0.6);"></div>`,
+  html: `<div style="width:20px; height:20px; background:#059669; border:2.5px solid white; border-radius:50%; box-shadow:0 0 6px rgba(5,150,105,0.7);"></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
@@ -59,7 +65,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
           <Marker position={[bystanderLat, bystanderLng]} icon={userLocationIcon}>
             <Popup>
               <div className="p-1 text-center font-sans">
-                <p className="font-semibold text-xs text-blue-700">Your Location</p>
+                <p className="font-semibold text-xs text-emerald-800">Your Location</p>
                 <p className="text-[10px] text-slate-500">
                   {bystanderLat.toFixed(4)}, {bystanderLng.toFixed(4)}
                 </p>
@@ -88,7 +94,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
                     rel="noopener noreferrer"
                     className="mt-1.5 inline-flex items-center gap-1 bg-red-600 text-white text-[10px] font-semibold px-2 py-0.5 rounded"
                   >
-                    Directions
+                    <span>Directions</span>
                   </a>
                 </div>
               </Popup>
@@ -99,7 +105,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
         {loading && (
           <div className="absolute inset-0 bg-white/70 backdrop-blur-2xs flex items-center justify-center z-20">
             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 shadow-xs">
-              <span className="w-3 h-3 rounded-full border-2 border-red-600 border-t-transparent animate-spin"></span>
+              <span className="w-3 h-3 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin"></span>
               Finding nearby emergency centers...
             </div>
           </div>
@@ -110,7 +116,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
       <div className="space-y-2">
         {hospitals.length === 0 && !loading && (
           <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center text-xs text-slate-500">
-            No emergency clinics detected nearby. Call 911 for emergency dispatch.
+            No emergency clinics detected nearby. Use the encrypted emergency call relay to contact responders.
           </div>
         )}
 
@@ -118,7 +124,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
           {hospitals.slice(0, 4).map((facility) => (
             <div
               key={facility.id}
-              className="bg-white border border-slate-200 rounded-lg p-2.5 flex flex-col justify-between hover:border-slate-300 transition"
+              className="bg-white border border-slate-200 rounded-lg p-2.5 flex flex-col justify-between hover:border-emerald-300 transition shadow-xs"
             >
               <div>
                 <div className="flex items-start justify-between gap-1.5">
@@ -126,7 +132,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
                     {facility.name}
                   </h5>
                   {facility.distanceKm !== undefined && (
-                    <span className="text-[10px] font-medium bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded whitespace-nowrap">
+                    <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.5 rounded whitespace-nowrap">
                       {facility.distanceKm} km
                     </span>
                   )}
@@ -140,9 +146,9 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
                 {facility.phone ? (
                   <a
                     href={`tel:${facility.phone}`}
-                    className="text-[11px] font-medium text-slate-600 hover:text-slate-900 inline-flex items-center gap-1"
+                    className="text-[11px] font-medium text-slate-600 hover:text-emerald-700 inline-flex items-center gap-1.5"
                   >
-                    <Phone className="w-3 h-3 text-slate-400" />
+                    <FontAwesomeIcon icon={faPhone} className="text-slate-400 text-xs" />
                     <span>{facility.phone}</span>
                   </a>
                 ) : (
@@ -153,9 +159,9 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
                   href={`https://www.google.com/maps/dir/?api=1&destination=${facility.lat},${facility.lng}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white text-[10px] font-medium px-2 py-0.5 rounded transition"
+                  className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-medium px-2 py-0.5 rounded transition shadow-xs"
                 >
-                  <Navigation className="w-2.5 h-2.5" />
+                  <FontAwesomeIcon icon={faLocationArrow} className="text-[9px]" />
                   <span>Directions</span>
                 </a>
               </div>

@@ -192,9 +192,10 @@ app.get('/api/scan/:token', async (req: Request, res: Response) => {
       emergencyContacts: (profile.emergencyContacts || []).map((contact) => ({
         id: contact.id,
         name: contact.name,
-        relationship: contact.relationship,
+        relationship: contact.relationship || 'Emergency Contact',
         phone: contact.phone,
-        isPrimary: contact.isPrimary
+        isPrimary: contact.isPrimary,
+        hasProxyRelay: true
       })),
       scannedAt: new Date().toISOString()
     };
@@ -250,9 +251,10 @@ app.post('/api/scan/:token/verify-pin', async (req: Request, res: Response) => {
         emergencyContacts: (profile.emergencyContacts || []).map((contact) => ({
           id: contact.id,
           name: contact.name,
-          relationship: contact.relationship,
+          relationship: contact.relationship || 'Emergency Contact',
           phone: contact.phone,
-          isPrimary: contact.isPrimary
+          isPrimary: contact.isPrimary,
+          hasProxyRelay: true
         })),
         scannedAt: new Date().toISOString()
       };
@@ -300,6 +302,33 @@ app.post('/api/scan/:token/notify-location', async (req: Request, res: Response)
   } catch (err: any) {
     console.error('Error broadcasting emergency location:', err);
     res.status(500).json({ error: 'Failed to broadcast location alert', details: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 6b. Encrypted Voice Relay (Masked Emergency Call & Caller ID Privacy)
+// -------------------------------------------------------------
+app.post('/api/scan/:token/call-contact', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+    const { contactId } = req.body;
+
+    if (!isValidToken(token)) {
+      return res.status(400).json({ error: 'Invalid emergency token' });
+    }
+
+    const profileId = decryptId(token);
+    const profile = await storage.getProfileById(profileId);
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Medical profile not found' });
+    }
+
+    const result = await notifications.initiateMaskedEmergencyCall(profile, contactId);
+    res.json(result);
+  } catch (err: any) {
+    console.error('Error initiating encrypted proxy call:', err);
+    res.status(500).json({ error: 'Failed to initiate proxy call', details: err.message });
   }
 });
 

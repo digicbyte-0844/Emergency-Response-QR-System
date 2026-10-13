@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MedicalProfile, PublicEmergencyProfile, HospitalFacility, LocationAlertResponse } from './types';
+import { MedicalProfile, PublicEmergencyProfile, HospitalFacility, LocationAlertResponse, ProxyCallResponse } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
@@ -50,6 +50,11 @@ export const api = {
     payload: { latitude: number; longitude: number; accuracy?: number; bystanderNote?: string }
   ): Promise<LocationAlertResponse> {
     const res = await client.post(`/api/scan/${token}/notify-location`, payload);
+    return res.data;
+  },
+
+  async callEmergencyContact(token: string, contactId?: string): Promise<ProxyCallResponse> {
+    const res = await client.post(`/api/scan/${token}/call-contact`, { contactId });
     return res.data;
   },
 

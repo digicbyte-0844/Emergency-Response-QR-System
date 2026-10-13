@@ -3,12 +3,15 @@ import { useParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { api } from '../api';
 import { PublicEmergencyProfile } from '../types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  Printer, 
-  ArrowLeft, 
-  Smartphone, 
-  ShieldCheck 
-} from 'lucide-react';
+  faPrint, 
+  faArrowLeft, 
+  faMobileScreenButton, 
+  faSuitcaseMedical, 
+  faPhone,
+  faTriangleExclamation
+} from '@fortawesome/free-solid-svg-icons';
 
 export const CardPreview: React.FC = () => {
   const { token } = useParams<{ token: string }>();
@@ -59,24 +62,27 @@ export const CardPreview: React.FC = () => {
           <div>
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-800 mb-1"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-emerald-700 mb-1"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
+              <FontAwesomeIcon icon={faArrowLeft} className="text-xs" />
+              <span>Back to Dashboard</span>
             </Link>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-              Printable Medical ID Card
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <FontAwesomeIcon icon={faSuitcaseMedical} className="text-emerald-600 text-lg" />
+              <span>Printable Medical ID Card</span>
             </h1>
             <p className="text-xs text-slate-500">
-              Standard wallet card size (85.6mm × 54mm). Cut along the dotted line after printing.
+              Standard wallet card size (85.6mm × 54mm). Cut along dotted borders after printing.
             </p>
           </div>
 
           <div>
+            {/* 30% Green Action Button */}
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2.5 rounded-lg transition text-xs shadow-xs"
+              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold px-4 py-2.5 rounded-lg transition text-xs shadow-xs"
             >
-              <Printer className="w-4 h-4" />
+              <FontAwesomeIcon icon={faPrint} className="text-xs" />
               <span>Print Wallet Card</span>
             </button>
           </div>
@@ -85,7 +91,7 @@ export const CardPreview: React.FC = () => {
         {/* Printable Card Container */}
         <div className="print-card-container space-y-6">
           <div className="text-center no-print">
-            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
               Front & Back Card Preview
             </span>
           </div>
@@ -93,19 +99,21 @@ export const CardPreview: React.FC = () => {
           {/* Cards Front & Back */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             
-            {/* FRONT OF CARD */}
+            {/* FRONT OF CARD (60% White + 30% Green frame + 10% Red Blood Badge) */}
             <div className="w-[340px] h-[214px] bg-white rounded-xl border border-dashed border-slate-300 p-4 shadow-sm flex flex-col justify-between relative overflow-hidden select-none">
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-red-500 pb-2">
+              {/* Header (30% Green Accent) */}
+              <div className="flex items-center justify-between border-b border-emerald-600 pb-2">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded bg-red-600 text-white flex items-center justify-center font-bold text-xs">
-                    ✚
+                  <div className="w-5 h-5 rounded bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                    <FontAwesomeIcon icon={faSuitcaseMedical} className="text-[10px]" />
                   </div>
-                  <span className="font-bold text-xs text-red-600 tracking-wide uppercase">
+                  <span className="font-extrabold text-xs text-emerald-800 tracking-wide uppercase">
                     EMERGENCY MEDICAL ID
                   </span>
                 </div>
-                <div className="bg-red-50 text-red-700 border border-red-200 font-bold text-xs px-2 py-0.5 rounded">
+
+                {/* 10% Red Blood Group Badge */}
+                <div className="bg-red-50 text-red-600 border border-red-200 font-bold text-xs px-2 py-0.5 rounded">
                   Blood {patient.bloodType}
                 </div>
               </div>
@@ -123,7 +131,7 @@ export const CardPreview: React.FC = () => {
 
                 {patient.allergies && patient.allergies.length > 0 && (
                   <div className="text-[11px] bg-red-50 text-red-800 p-1.5 rounded border border-red-200">
-                    <span className="font-bold uppercase text-[9px] block text-red-700">Allergies:</span>
+                    <span className="font-bold uppercase text-[9px] block text-red-600">Allergies:</span>
                     <span className="font-semibold truncate block">{patient.allergies.join(', ')}</span>
                   </div>
                 )}
@@ -140,23 +148,23 @@ export const CardPreview: React.FC = () => {
                 {primaryContact ? (
                   <div>
                     <span className="font-semibold text-slate-500 uppercase text-[9px] block">Emergency Contact:</span>
-                    <span className="font-bold text-slate-900">{primaryContact.name} ({primaryContact.relationship})</span>
-                    <span className="font-semibold text-red-600 block">{primaryContact.phone}</span>
+                    <span className="font-bold text-slate-900">{primaryContact.name || primaryContact.relationship}</span>
+                    <span className="font-bold text-red-600 block text-[9px]">{primaryContact.phone || 'Scan to Call'}</span>
                   </div>
                 ) : (
-                  <span className="text-slate-400">Call 911 / 112</span>
+                  <span className="text-slate-400">Emergency Voice Relay</span>
                 )}
-                <span className="text-[9px] font-semibold text-slate-400 uppercase">FRONT</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase">FRONT</span>
               </div>
             </div>
 
             {/* BACK OF CARD */}
             <div className="w-[340px] h-[214px] bg-white rounded-xl border border-dashed border-slate-300 p-4 shadow-sm flex flex-col justify-between relative overflow-hidden select-none">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-1.5">
-                <span className="font-semibold text-[10px] uppercase tracking-wide text-slate-600">
-                  SCAN FOR MEDICAL DETAILS
+              <div className="flex items-center justify-between border-b border-emerald-600 pb-1.5">
+                <span className="font-bold text-[10px] uppercase tracking-wide text-emerald-800">
+                  SCAN FOR COMPLETE VITALS
                 </span>
-                <span className="text-[9px] font-semibold text-slate-400 uppercase">BACK</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase">BACK</span>
               </div>
 
               {/* QR and Instructions */}
@@ -170,15 +178,15 @@ export const CardPreview: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-1 text-[10px] text-slate-600 leading-tight">
-                  <p className="font-bold text-red-600 uppercase text-[10px]">
+                  <p className="font-bold text-emerald-700 uppercase text-[10px]">
                     SCAN WITH ANY SMARTPHONE CAMERA
                   </p>
                   <p>
-                    Instant access to complete vitals, active medications, doctor info, and location beacon.
+                    Instant bystander access to full medical history, active medications, doctor info, and family GPS beacon.
                   </p>
                   {secondaryContact && (
                     <p className="pt-0.5 text-[9px] text-slate-500">
-                      <strong>Secondary:</strong> {secondaryContact.name} ({secondaryContact.phone})
+                      <strong>Secondary:</strong> {secondaryContact.name || secondaryContact.relationship} {secondaryContact.phone ? `(${secondaryContact.phone})` : ''}
                     </p>
                   )}
                 </div>
@@ -192,11 +200,11 @@ export const CardPreview: React.FC = () => {
 
           </div>
 
-          {/* Tips - Hidden during print */}
+          {/* Usage Tips - Hidden during print */}
           <div className="no-print bg-white p-5 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2.5 shadow-xs">
-            <h4 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-slate-600" />
-              Usage Tips:
+            <h4 className="font-bold text-slate-900 text-xs flex items-center gap-2">
+              <FontAwesomeIcon icon={faMobileScreenButton} className="text-emerald-600" />
+              <span>Recommended Ways to Carry:</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-3 bg-slate-50 rounded-lg">
@@ -208,13 +216,13 @@ export const CardPreview: React.FC = () => {
               <div className="p-3 bg-slate-50 rounded-lg">
                 <p className="font-semibold text-slate-800 mb-0.5">2. Clear Phone Case</p>
                 <p className="text-[11px] text-slate-500">
-                  Slip behind a clear phone case so it's always accessible even if battery dies.
+                  Slip behind a clear phone case so it's scannable even if phone battery is dead.
                 </p>
               </div>
               <div className="p-3 bg-slate-50 rounded-lg">
                 <p className="font-semibold text-slate-800 mb-0.5">3. Backpack / Gear</p>
                 <p className="text-[11px] text-slate-500">
-                  Great for running belts, cycling helmets, gym bags, and school backpacks.
+                  Ideal for cyclists, marathoners, gym lockers, and school bags.
                 </p>
               </div>
             </div>

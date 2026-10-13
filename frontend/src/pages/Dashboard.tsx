@@ -4,22 +4,21 @@ import { QRCodeSVG } from 'qrcode.react';
 import confetti from 'canvas-confetti';
 import { api } from '../api';
 import { BloodType, MedicalProfile, EmergencyContact } from '../types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  HeartPulse, 
-  Plus, 
-  Trash2, 
-  Download, 
-  Printer, 
-  Check, 
-  Copy, 
-  QrCode, 
-  User, 
-  Phone, 
-  AlertCircle,
-  ExternalLink,
-  ArrowRight,
-  ShieldCheck
-} from 'lucide-react';
+  faHeartPulse, 
+  faSuitcaseMedical,
+  faQrcode, 
+  faPlus, 
+  faPrint, 
+  faCopy, 
+  faDownload, 
+  faCheck, 
+  faTriangleExclamation,
+  faExternalLink,
+  faPhone,
+  faCircleCheck
+} from '@fortawesome/free-solid-svg-icons';
 
 const BLOOD_TYPES: BloodType[] = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'Unknown'];
 
@@ -97,7 +96,7 @@ export const Dashboard: React.FC = () => {
         isPrimary: true,
       });
       setHasSecondary(false);
-      setCriticalNotes('Severe peanut allergy. If unresponsive, administer EpiPen from jacket pocket immediately and call 911.');
+      setCriticalNotes('Severe peanut allergy. If unresponsive, administer EpiPen from jacket pocket immediately and connect emergency relay.');
       setPreferredHospital('City General Medical Center');
     } else if (type === 'alex') {
       setFullName('Alex Rivera');
@@ -283,52 +282,54 @@ export const Dashboard: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Create Medical ID
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <FontAwesomeIcon icon={faSuitcaseMedical} className="text-emerald-600 text-xl" />
+              <span>Create Medical ID</span>
             </h1>
             <p className="text-xs text-slate-600 mt-0.5">
-              Enter your vital medical information to generate your emergency QR code.
+              Enter your vital medical information to generate your encrypted emergency QR code.
             </p>
           </div>
 
           {/* Quick preset selector */}
-          <div className="flex items-center gap-1.5 self-start bg-white border border-slate-200 rounded-lg p-1 text-xs">
+          <div className="flex items-center gap-1.5 self-start bg-white border border-slate-200 rounded-lg p-1 text-xs shadow-xs">
             <span className="text-[11px] text-slate-400 font-medium px-1.5">Sample:</span>
             <button
               type="button"
               onClick={() => loadScenario('sarah')}
-              className="px-2 py-0.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 transition"
+              className="px-2 py-0.5 rounded text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition"
             >
-              Sarah
+              Sarah (Allergy)
             </button>
             <button
               type="button"
               onClick={() => loadScenario('alex')}
               className="px-2 py-0.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 transition"
             >
-              Alex
+              Alex (Diabetic)
             </button>
             <button
               type="button"
               onClick={() => loadScenario('robert')}
               className="px-2 py-0.5 rounded text-xs font-medium text-slate-700 hover:bg-slate-100 transition"
             >
-              Robert
+              Robert (Cardiac)
             </button>
           </div>
         </div>
 
         {/* QR Code Generated Success View */}
         {qrToken && (
-          <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs text-center space-y-6">
-            <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-              <Check className="w-5 h-5" />
+          <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs text-center space-y-6 animate-fadeIn">
+            {/* 30% Green Success Icon */}
+            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto text-xl">
+              <FontAwesomeIcon icon={faCircleCheck} />
             </div>
 
             <div>
               <h2 className="text-xl font-bold text-slate-900">Your Emergency QR is Ready</h2>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                Scan this code with any phone camera to instantly view your emergency profile.
+                Scan this code with any phone camera to instantly view your emergency medical profile.
               </p>
             </div>
 
@@ -341,44 +342,45 @@ export const Dashboard: React.FC = () => {
                 level="M"
                 includeMargin={false}
               />
-              <p className="text-[11px] font-semibold text-slate-500 mt-2">
-                {fullName} • Blood {bloodType}
+              <p className="text-xs font-bold text-slate-700 mt-2">
+                {fullName} • <span className="text-red-600 font-black">Blood {bloodType}</span>
               </p>
             </div>
 
             {/* Action Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-md mx-auto pt-2">
+              {/* 30% Green Primary Action */}
               <Link
                 to={`/scan/${qrToken}`}
-                className="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-xs"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faExternalLink} className="text-xs" />
                 <span>Test Scan View</span>
               </Link>
 
               <Link
                 to={`/card/${qrToken}`}
-                className="bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition"
+                className="bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-xs"
               >
-                <Printer className="w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faPrint} className="text-xs" />
                 <span>Print Wallet Card</span>
               </Link>
 
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                <FontAwesomeIcon icon={copied ? faCheck : faCopy} className={copied ? "text-emerald-600" : ""} />
                 <span>{copied ? 'Link Copied!' : 'Copy Scan URL'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadQr}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition"
               >
-                <Download className="w-3.5 h-3.5" />
+                <FontAwesomeIcon icon={faDownload} />
                 <span>Download QR Image</span>
               </button>
             </div>
@@ -395,21 +397,21 @@ export const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Error Notification */}
+        {/* Error Notification (10% Red) */}
         {errorMsg && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-600 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        {/* Profile Creation Form */}
+        {/* Profile Creation Form - 60% White dominant */}
         {!qrToken && (
           <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* Section 1: Basic Information */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-xs">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+              <h2 className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded w-fit">
                 1. Basic Information
               </h2>
 
@@ -424,7 +426,7 @@ export const Dashboard: React.FC = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Sarah Chen"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
 
@@ -437,7 +439,7 @@ export const Dashboard: React.FC = () => {
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                     placeholder="e.g. 28"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
 
@@ -446,7 +448,7 @@ export const Dashboard: React.FC = () => {
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600 bg-white"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   >
                     <option value="Female">Female</option>
                     <option value="Male">Male</option>
@@ -469,7 +471,7 @@ export const Dashboard: React.FC = () => {
                       onClick={() => setBloodType(type)}
                       className={`py-1.5 text-xs font-bold rounded-md border text-center transition ${
                         bloodType === type
-                          ? 'bg-red-600 border-red-600 text-white shadow-xs'
+                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
@@ -482,11 +484,11 @@ export const Dashboard: React.FC = () => {
 
             {/* Section 2: Critical Health Details */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-xs">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+              <h2 className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded w-fit">
                 2. Critical Medical Details
               </h2>
 
-              {/* Allergies */}
+              {/* Allergies (10% Red Accents for critical danger) */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-slate-700">
                   Severe Allergies (e.g. Peanuts, Penicillin)
@@ -498,12 +500,12 @@ export const Dashboard: React.FC = () => {
                     onChange={(e) => setAllergyInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addAllergy())}
                     placeholder="Type an allergy..."
-                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                   <button
                     type="button"
                     onClick={() => addAllergy()}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-xs font-medium"
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-xs font-semibold"
                   >
                     Add
                   </button>
@@ -524,19 +526,19 @@ export const Dashboard: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Tags */}
+                {/* Tags (10% Red for severe allergy alert) */}
                 {allergies.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {allergies.map((item) => (
                       <span
                         key={item}
-                        className="inline-flex items-center gap-1 bg-red-50 text-red-700 border border-red-200 text-xs font-medium px-2.5 py-1 rounded-md"
+                        className="inline-flex items-center gap-1.5 bg-red-50 text-red-700 border border-red-200 text-xs font-semibold px-2.5 py-1 rounded-md"
                       >
-                        {item}
+                        <span>{item}</span>
                         <button
                           type="button"
                           onClick={() => removeAllergy(item)}
-                          className="text-red-400 hover:text-red-700"
+                          className="text-red-400 hover:text-red-700 font-bold"
                         >
                           ×
                         </button>
@@ -546,7 +548,7 @@ export const Dashboard: React.FC = () => {
                 )}
               </div>
 
-              {/* Conditions */}
+              {/* Conditions (30% Green / Neutral Tags) */}
               <div className="space-y-1.5 pt-2 border-t border-slate-100">
                 <label className="block text-xs font-semibold text-slate-700">
                   Medical Conditions (e.g. Asthma, Diabetes)
@@ -558,12 +560,12 @@ export const Dashboard: React.FC = () => {
                     onChange={(e) => setConditionInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCondition())}
                     placeholder="Type a medical condition..."
-                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                   <button
                     type="button"
                     onClick={() => addCondition()}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-xs font-medium"
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-xs font-semibold"
                   >
                     Add
                   </button>
@@ -588,13 +590,13 @@ export const Dashboard: React.FC = () => {
                     {chronicConditions.map((item) => (
                       <span
                         key={item}
-                        className="inline-flex items-center gap-1 bg-slate-100 text-slate-800 border border-slate-200 text-xs font-medium px-2.5 py-1 rounded-md"
+                        className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium px-2.5 py-1 rounded-md"
                       >
-                        {item}
+                        <span>{item}</span>
                         <button
                           type="button"
                           onClick={() => removeCondition(item)}
-                          className="text-slate-400 hover:text-slate-700"
+                          className="text-emerald-400 hover:text-emerald-700 font-bold"
                         >
                           ×
                         </button>
@@ -616,12 +618,12 @@ export const Dashboard: React.FC = () => {
                     onChange={(e) => setMedicationInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addMedication())}
                     placeholder="Type a medication..."
-                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                   <button
                     type="button"
                     onClick={() => addMedication()}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-xs font-medium"
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-xs font-semibold"
                   >
                     Add
                   </button>
@@ -632,13 +634,13 @@ export const Dashboard: React.FC = () => {
                     {medications.map((item) => (
                       <span
                         key={item}
-                        className="inline-flex items-center gap-1 bg-slate-100 text-slate-800 border border-slate-200 text-xs font-medium px-2.5 py-1 rounded-md"
+                        className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-800 border border-slate-200 text-xs font-medium px-2.5 py-1 rounded-md"
                       >
-                        {item}
+                        <span>{item}</span>
                         <button
                           type="button"
                           onClick={() => removeMedication(item)}
-                          className="text-slate-400 hover:text-slate-700"
+                          className="text-slate-400 hover:text-slate-700 font-bold"
                         >
                           ×
                         </button>
@@ -655,7 +657,7 @@ export const Dashboard: React.FC = () => {
                     type="checkbox"
                     checked={organDonor}
                     onChange={(e) => setOrganDonor(e.target.checked)}
-                    className="rounded text-red-600 focus:ring-0 w-4 h-4"
+                    className="rounded text-emerald-600 focus:ring-0 w-4 h-4"
                   />
                   <span className="text-xs font-medium text-slate-700">Organ Donor</span>
                 </label>
@@ -665,7 +667,7 @@ export const Dashboard: React.FC = () => {
                   <select
                     value={resuscitationStatus}
                     onChange={(e) => setResuscitationStatus(e.target.value as any)}
-                    className="text-xs px-2 py-1 border border-slate-200 rounded bg-white"
+                    className="text-xs px-2 py-1 border border-slate-200 rounded bg-white focus:outline-none"
                   >
                     <option value="Full Code">Full Code</option>
                     <option value="DNR">DNR (Do Not Resuscitate)</option>
@@ -677,7 +679,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Section 3: Emergency Contact */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-xs">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+              <h2 className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded w-fit">
                 3. Primary Emergency Contact
               </h2>
 
@@ -692,7 +694,7 @@ export const Dashboard: React.FC = () => {
                     value={primaryContact.name}
                     onChange={(e) => setPrimaryContact({ ...primaryContact, name: e.target.value })}
                     placeholder="e.g. David Chen"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
 
@@ -703,7 +705,7 @@ export const Dashboard: React.FC = () => {
                     value={primaryContact.relationship}
                     onChange={(e) => setPrimaryContact({ ...primaryContact, relationship: e.target.value })}
                     placeholder="e.g. Spouse / Parent"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
 
@@ -717,7 +719,7 @@ export const Dashboard: React.FC = () => {
                     value={primaryContact.phone}
                     onChange={(e) => setPrimaryContact({ ...primaryContact, phone: e.target.value })}
                     placeholder="e.g. +1 555-234-5678"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
               </div>
@@ -727,9 +729,9 @@ export const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setHasSecondary(!hasSecondary)}
-                  className="text-xs font-medium text-slate-600 hover:text-slate-900 inline-flex items-center gap-1"
+                  className="text-xs font-medium text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1.5"
                 >
-                  <Plus className="w-3.5 h-3.5 text-slate-400" />
+                  <FontAwesomeIcon icon={faPlus} className="text-xs" />
                   <span>{hasSecondary ? 'Remove Secondary Contact' : 'Add Secondary Contact (Optional)'}</span>
                 </button>
 
@@ -742,7 +744,7 @@ export const Dashboard: React.FC = () => {
                         value={secondaryContact.name}
                         onChange={(e) => setSecondaryContact({ ...secondaryContact, name: e.target.value })}
                         placeholder="e.g. Dr. Vance"
-                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none"
+                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none bg-white"
                       />
                     </div>
                     <div className="space-y-1">
@@ -752,7 +754,7 @@ export const Dashboard: React.FC = () => {
                         value={secondaryContact.relationship}
                         onChange={(e) => setSecondaryContact({ ...secondaryContact, relationship: e.target.value })}
                         placeholder="e.g. Doctor"
-                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none"
+                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none bg-white"
                       />
                     </div>
                     <div className="space-y-1">
@@ -762,7 +764,7 @@ export const Dashboard: React.FC = () => {
                         value={secondaryContact.phone}
                         onChange={(e) => setSecondaryContact({ ...secondaryContact, phone: e.target.value })}
                         placeholder="e.g. +1 555-876-5432"
-                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none"
+                        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none bg-white"
                       />
                     </div>
                   </div>
@@ -772,7 +774,7 @@ export const Dashboard: React.FC = () => {
 
             {/* Section 4: Emergency Notes (Optional) */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-xs">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider text-slate-500">
+              <h2 className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded w-fit">
                 4. Emergency Notes (Optional)
               </h2>
 
@@ -786,7 +788,7 @@ export const Dashboard: React.FC = () => {
                     value={criticalNotes}
                     onChange={(e) => setCriticalNotes(e.target.value)}
                     placeholder="e.g. EpiPen in outer backpack pocket. Administer immediately if unresponsive."
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
 
@@ -799,21 +801,21 @@ export const Dashboard: React.FC = () => {
                     value={preferredHospital}
                     onChange={(e) => setPreferredHospital(e.target.value)}
                     placeholder="e.g. City General Medical Center"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-red-600"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* 30% Green Primary Submit Button */}
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-50 text-white font-semibold py-3.5 px-4 rounded-xl text-sm transition shadow-xs flex items-center justify-center gap-2"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 text-white font-semibold py-3.5 px-4 rounded-xl text-sm transition shadow-xs flex items-center justify-center gap-2"
               >
-                <QrCode className="w-4 h-4" />
-                <span>{isSubmitting ? 'Creating Medical ID...' : 'Generate Emergency QR Code'}</span>
+                <FontAwesomeIcon icon={faQrcode} className="text-sm" />
+                <span>{isSubmitting ? 'Generating Medical ID...' : 'Generate Emergency QR Code'}</span>
               </button>
             </div>
 

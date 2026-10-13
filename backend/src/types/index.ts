@@ -52,12 +52,20 @@ export interface PublicEmergencyProfile {
   isUnlocked?: boolean;
   emergencyContacts: {
     id: string;
-    name: string;
+    name?: string;
     relationship: string;
-    phone: string;
+    phone?: string;
     isPrimary: boolean;
+    hasProxyRelay: boolean;
   }[];
   scannedAt: string;
+}
+
+export interface ProxyCallResponse {
+  success: boolean;
+  message: string;
+  proxyTelUri?: string;
+  simulated: boolean;
 }
 
 export interface LocationAlertRequest {

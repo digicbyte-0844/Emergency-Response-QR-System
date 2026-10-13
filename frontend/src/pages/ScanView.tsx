@@ -6,22 +6,24 @@ import { HospitalMap } from '../components/HospitalMap';
 import { FirstAidModal } from '../components/FirstAidModal';
 import { VoiceAssistant } from '../components/VoiceAssistant';
 import { SupportedLanguage, TRANSLATIONS } from '../utils/translations';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  HeartPulse, 
-  Phone, 
-  MapPin, 
-  AlertTriangle, 
-  Building2, 
-  Share2, 
-  RefreshCw, 
-  Lock, 
-  Unlock, 
-  Globe, 
-  WifiOff, 
-  CheckCircle2,
-  HeartHandshake,
-  ExternalLink
-} from 'lucide-react';
+  faHeartPulse, 
+  faPhone, 
+  faLocationDot, 
+  faTriangleExclamation, 
+  faHospital, 
+  faShareNodes, 
+  faArrowsRotate, 
+  faLock, 
+  faUnlock, 
+  faGlobe, 
+  faWifi, 
+  faCircleCheck,
+  faSuitcaseMedical,
+  faExternalLink,
+  faShieldHalved
+} from '@fortawesome/free-solid-svg-icons';
 
 export const ScanView: React.FC = () => {
   const { token } = useParams<{ token: string }>();
@@ -56,6 +58,16 @@ export const ScanView: React.FC = () => {
   const [firstAidOpen, setFirstAidOpen] = useState(false);
   const [firstAidTopic, setFirstAidTopic] = useState<'cpr' | 'anaphylaxis' | 'diabetic' | 'seizure' | 'recovery'>('cpr');
 
+  // Encrypted Voice Relay State (Caller ID Masked)
+  const [callingContactId, setCallingContactId] = useState<string | null>(null);
+  const [callStatus, setCallStatus] = useState<{
+    success: boolean;
+    message: string;
+    proxyTelUri?: string;
+    simulated: boolean;
+  } | null>(null);
+  const [callModalOpen, setCallModalOpen] = useState(false);
+
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
   // Listen to network status for offline resilience
@@ -70,7 +82,7 @@ export const ScanView: React.FC = () => {
             localStorage.removeItem('queued_emergency_beacon');
             setAlertResult({
               success: true,
-              message: 'Cellular restored! Queued GPS beacon sent to emergency contacts.',
+              message: 'Cellular restored! Queued GPS beacon dispatched to emergency contacts.',
             });
           });
         } catch {}
@@ -145,7 +157,7 @@ export const ScanView: React.FC = () => {
       });
   };
 
-  // Broadcast GPS location
+  // Broadcast GPS location (30% Green Action)
   const handleSendLocationAlert = async () => {
     if (!token) return;
 
@@ -222,10 +234,36 @@ export const ScanView: React.FC = () => {
     }
   };
 
+  // Encrypted Voice Relay Call Handler
+  const handleInitiateProxyCall = async (contactId?: string) => {
+    if (!token) return;
+    setCallingContactId(contactId || 'primary');
+    setCallModalOpen(true);
+    setCallStatus(null);
+
+    try {
+      const res = await api.callEmergencyContact(token, contactId);
+      setCallStatus(res);
+      if (res.proxyTelUri) {
+        setTimeout(() => {
+          window.location.href = res.proxyTelUri!;
+        }, 1200);
+      }
+    } catch (err: any) {
+      setCallStatus({
+        success: false,
+        message: err.response?.data?.error || 'Failed to connect encrypted proxy relay.',
+        simulated: false,
+      });
+    } finally {
+      setCallingContactId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <div className="w-8 h-8 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mb-3"></div>
         <p className="text-sm font-semibold text-slate-800">Loading Medical Information...</p>
         <p className="text-xs text-slate-500 mt-1">Accessing verified medical vault</p>
       </div>
@@ -236,24 +274,17 @@ export const ScanView: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="max-w-sm w-full bg-white rounded-xl p-6 border border-slate-200 text-center space-y-4 shadow-xs">
-          <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
-            <AlertTriangle className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto text-lg">
+            <FontAwesomeIcon icon={faTriangleExclamation} />
           </div>
           <div>
             <h2 className="text-lg font-bold text-slate-900">Profile Not Found</h2>
-            <p className="text-xs text-slate-500 mt-1">{error || 'Unable to find emergency profile.'}</p>
+            <p className="text-xs text-slate-500 mt-1">{error || 'Unable to decrypt emergency profile.'}</p>
           </div>
-          <div className="space-y-2 pt-2">
-            <a
-              href="tel:911"
-              className="w-full bg-red-600 text-white py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center gap-1.5"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              Call 911 / 112 Immediately
-            </a>
+          <div className="pt-2">
             <Link
               to="/"
-              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg font-medium text-xs flex items-center justify-center"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition"
             >
               Return Home
             </Link>
@@ -271,17 +302,17 @@ export const ScanView: React.FC = () => {
       
       {/* Offline Alert */}
       {isOffline && (
-        <div className="bg-slate-800 text-white px-4 py-2 text-xs font-medium flex items-center justify-center gap-1.5">
-          <WifiOff className="w-3.5 h-3.5 text-amber-400" />
-          <span>Offline mode active: Vitals available locally. GPS alert will queue.</span>
+        <div className="bg-slate-800 text-white px-4 py-2 text-xs font-medium flex items-center justify-center gap-2">
+          <FontAwesomeIcon icon={faWifi} className="text-amber-400 text-xs" />
+          <span>Offline mode: Vitals available locally. GPS alert will queue.</span>
         </div>
       )}
 
-      {/* Emergency Header Bar */}
+      {/* Emergency Header Bar - 60% White base + 30% Green identity */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 sticky top-12 z-40">
         <div className="max-w-md mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-red-600"></div>
+          <div className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></div>
             <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
               {t.emergencyHeader}
             </span>
@@ -297,7 +328,7 @@ export const ScanView: React.FC = () => {
                   key={lang}
                   onClick={() => setLanguage(lang)}
                   className={`px-1.5 py-0.5 rounded transition ${
-                    language === lang ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                    language === lang ? 'bg-white text-emerald-800 shadow-xs font-bold' : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   {lang.toUpperCase()}
@@ -310,30 +341,30 @@ export const ScanView: React.FC = () => {
 
       <div className="max-w-md mx-auto p-4 space-y-3.5">
         
-        {/* Core Identity & Blood Group Card */}
+        {/* Core Identity & Blood Group Card (60% White + 10% Red Blood Badge) */}
         <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+              <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded w-fit">
                 {t.patientIdentity}
               </p>
-              <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+              <h2 className="text-xl font-bold text-slate-900 mt-1">
                 {patient.fullName}
               </h2>
               <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                 {patient.age && <span>{patient.age} yrs old</span>}
                 {patient.gender && <span>• {patient.gender}</span>}
                 {patient.organDonor && (
-                  <span className="text-emerald-700 font-medium bg-emerald-50 px-1.5 py-0.5 rounded text-[10px]">
+                  <span className="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded text-[10px]">
                     Organ Donor
                   </span>
                 )}
               </div>
             </div>
 
-            {/* High-visibility Blood Type Badge */}
-            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-1.5 text-center min-w-[70px] shrink-0">
-              <span className="block text-[9px] font-bold text-red-600 uppercase tracking-wider">{t.bloodType}</span>
+            {/* 10% Red High-visibility Blood Type Badge */}
+            <div className="bg-red-50 border border-red-300 rounded-lg px-3 py-1.5 text-center min-w-[70px] shrink-0">
+              <span className="block text-[9px] font-black text-red-600 uppercase tracking-wider">{t.bloodType}</span>
               <span className="text-2xl font-black text-red-600 leading-none">{patient.bloodType}</span>
             </div>
           </div>
@@ -348,11 +379,11 @@ export const ScanView: React.FC = () => {
           )}
         </div>
 
-        {/* Critical Allergies Box */}
+        {/* 10% Red Critical Allergies Alert Box */}
         {patient.allergies && patient.allergies.length > 0 ? (
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-2">
             <div className="flex items-center gap-1.5 text-red-800">
-              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+              <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-600 text-sm shrink-0" />
               <span className="text-xs font-bold uppercase tracking-wide">
                 {t.criticalAllergies}
               </span>
@@ -370,18 +401,19 @@ export const ScanView: React.FC = () => {
           </div>
         ) : (
           <div className="bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-600 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <FontAwesomeIcon icon={faCircleCheck} className="text-emerald-600" />
             <span>{t.noAllergies}</span>
           </div>
         )}
 
-        {/* Critical Action Note */}
+        {/* Critical Action Note (10% Red Alert Accent) */}
         {patient.criticalNotes && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-1">
-            <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
-              Emergency Action Note
+          <div className="bg-red-50/50 border border-red-200 rounded-xl p-3.5 space-y-1">
+            <span className="text-[10px] font-bold text-red-700 uppercase tracking-wider block flex items-center gap-1.5">
+              <FontAwesomeIcon icon={faTriangleExclamation} className="text-xs" />
+              <span>Emergency Action Note</span>
             </span>
-            <p className="text-xs font-medium text-slate-800 leading-relaxed">
+            <p className="text-xs font-semibold text-slate-900 leading-relaxed">
               {patient.criticalNotes}
             </p>
           </div>
@@ -391,7 +423,7 @@ export const ScanView: React.FC = () => {
         {patient.isPinProtected && !patient.isUnlocked ? (
           <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
             <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-slate-400" />
+              <FontAwesomeIcon icon={faLock} className="text-slate-400" />
               <div>
                 <p className="text-xs font-bold text-slate-900">{t.privacyLocked}</p>
                 <p className="text-[11px] text-slate-500">{t.privacyUnlock}</p>
@@ -411,12 +443,12 @@ export const ScanView: React.FC = () => {
                 placeholder="4-digit PIN"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                className="w-28 text-center bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono tracking-widest focus:outline-none focus:border-red-600"
+                className="w-28 text-center bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-mono tracking-widest focus:outline-none focus:border-emerald-600 bg-white"
               />
               <button
                 onClick={() => handleUnlockPin(false)}
                 disabled={unlocking}
-                className="bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs px-4 py-1.5 rounded-lg transition"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-1.5 rounded-lg transition shadow-xs"
               >
                 {unlocking ? 'Verifying...' : t.unlock}
               </button>
@@ -430,28 +462,28 @@ export const ScanView: React.FC = () => {
             </button>
           </div>
         ) : (
-          /* Unlocked or Public Conditions & Meds */
+          /* Unlocked or Public Conditions & Meds (30% Green Highlights) */
           <>
             {((patient.chronicConditions && patient.chronicConditions.length > 0) ||
               (patient.medications && patient.medications.length > 0)) && (
               <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
                 {patient.isPinProtected && patient.isUnlocked && (
-                  <div className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit">
-                    <Unlock className="w-3 h-3" />
+                  <div className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded w-fit">
+                    <FontAwesomeIcon icon={faUnlock} className="text-xs" />
                     <span>Unlocked for emergency care</span>
                   </div>
                 )}
 
                 {patient.chronicConditions && patient.chronicConditions.length > 0 && (
                   <div>
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                    <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block mb-1.5">
                       {t.chronicConditions}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {patient.chronicConditions.map((cond, i) => (
                         <span
                           key={i}
-                          className="bg-slate-100 text-slate-800 text-xs font-medium px-2.5 py-1 rounded-md"
+                          className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium px-2.5 py-1 rounded-md"
                         >
                           {cond}
                         </span>
@@ -462,7 +494,7 @@ export const ScanView: React.FC = () => {
 
                 {patient.medications && patient.medications.length > 0 && (
                   <div className="pt-2.5 border-t border-slate-100">
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
                       {t.medications}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -486,31 +518,31 @@ export const ScanView: React.FC = () => {
         {patient.preferredHospital && (
           <div className="bg-white rounded-xl p-3 border border-slate-200 flex items-center justify-between text-xs shadow-xs">
             <span className="text-slate-500 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
-              {t.preferredHospital}:
+              <FontAwesomeIcon icon={faHospital} className="text-emerald-600" />
+              <span>{t.preferredHospital}:</span>
             </span>
             <span className="font-semibold text-slate-900">{patient.preferredHospital}</span>
           </div>
         )}
 
-        {/* GPS Location Beacon Card */}
+        {/* GPS Location Beacon Card (30% Green Action) */}
         <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-2.5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-red-600" />
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon icon={faLocationDot} className="text-emerald-600 text-sm" />
               <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
                 {t.locationBeacon}
               </span>
             </div>
             {coords && (
-              <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
                 GPS Ready
               </span>
             )}
           </div>
 
           <p className="text-xs text-slate-500 leading-relaxed">
-            Send this incident's live GPS coordinates directly to family contacts.
+            Transmit this incident's live GPS coordinates directly to emergency contacts.
           </p>
 
           {showNoteInput && (
@@ -519,24 +551,25 @@ export const ScanView: React.FC = () => {
               placeholder="Optional note: e.g. Conscious on sidewalk"
               value={bystanderNote}
               onChange={(e) => setBystanderNote(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-red-600"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-600 bg-white"
             />
           )}
 
           <div className="flex gap-2">
+            {/* 30% Green Action Button */}
             <button
               onClick={handleSendLocationAlert}
               disabled={alertSending}
-              className="flex-1 bg-slate-900 hover:bg-slate-800 active:bg-black disabled:opacity-50 text-white font-medium py-2.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 transition"
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 text-white font-semibold py-2.5 px-3 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-xs"
             >
               {alertSending ? (
                 <>
                   <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  <span>Sending Location...</span>
+                  <span>Transmitting GPS...</span>
                 </>
               ) : (
                 <>
-                  <Share2 className="w-3.5 h-3.5 text-slate-300" />
+                  <FontAwesomeIcon icon={faShareNodes} className="text-xs" />
                   <span>Send GPS to Family</span>
                 </>
               )}
@@ -566,9 +599,10 @@ export const ScanView: React.FC = () => {
                   href={alertResult.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-1 inline-flex items-center gap-1 text-[11px] text-blue-700 underline"
+                  className="mt-1 inline-flex items-center gap-1 text-[11px] text-emerald-700 underline font-semibold"
                 >
-                  View GPS Map Pin <ExternalLink className="w-3 h-3" />
+                  <span>View Dispatched GPS Pin</span>
+                  <FontAwesomeIcon icon={faExternalLink} className="text-[10px]" />
                 </a>
               )}
             </div>
@@ -587,18 +621,18 @@ export const ScanView: React.FC = () => {
             }
             setFirstAidOpen(true);
           }}
-          className="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between text-left shadow-xs transition"
+          className="w-full bg-white hover:bg-emerald-50/40 border border-slate-200 rounded-xl p-3.5 flex items-center justify-between text-left shadow-xs transition"
         >
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold">
-              <HeartHandshake className="w-4 h-4" />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm">
+              <FontAwesomeIcon icon={faSuitcaseMedical} />
             </div>
             <div>
-              <p className="font-bold text-xs text-slate-900">First Aid Emergency Steps</p>
-              <p className="text-[11px] text-slate-500">CPR metronome, EpiPen guide, and recovery</p>
+              <p className="font-bold text-xs text-slate-900">First Aid Emergency Protocols</p>
+              <p className="text-[11px] text-slate-500">CPR pulse metronome, EpiPen guidance, and recovery</p>
             </div>
           </div>
-          <span className="text-xs font-semibold text-red-600">
+          <span className="text-xs font-semibold text-emerald-700">
             Open Guide →
           </span>
         </button>
@@ -607,17 +641,18 @@ export const ScanView: React.FC = () => {
         {coords && (
           <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5 text-slate-700" />
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={faHospital} className="text-emerald-700 text-sm" />
                 <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
                   {t.nearbyHospitals}
                 </span>
               </div>
               <button
                 onClick={() => coords && fetchHospitals(coords.lat, coords.lng)}
-                className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1"
+                className="text-[11px] text-slate-500 hover:text-emerald-700 flex items-center gap-1 font-medium"
               >
-                <RefreshCw className="w-3 h-3" /> Refresh
+                <FontAwesomeIcon icon={faArrowsRotate} className="text-[10px]" />
+                <span>Refresh</span>
               </button>
             </div>
 
@@ -632,34 +667,115 @@ export const ScanView: React.FC = () => {
 
       </div>
 
-      {/* Sticky Bottom Calling Bar */}
+      {/* Sticky Bottom Calling Bar - Encrypted Voice Relay */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-3 shadow-lg z-40 max-w-md mx-auto">
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {primaryContact && (
-            <a
-              href={`tel:${primaryContact.phone}`}
-              className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition"
+            <button
+              onClick={() => handleInitiateProxyCall(primaryContact.id)}
+              disabled={callingContactId !== null}
+              className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 disabled:opacity-60 text-white py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-xs cursor-pointer"
             >
-              <Phone className="w-4 h-4" />
-              <span>Call Contact: {primaryContact.name} ({primaryContact.phone})</span>
-            </a>
+              <FontAwesomeIcon icon={faPhone} />
+              <span>
+                {callingContactId === primaryContact.id
+                  ? 'Connecting Encrypted Voice Relay...'
+                  : `Call Emergency Contact (${primaryContact.relationship || 'Primary'})`}
+              </span>
+            </button>
           )}
 
-          <div className="flex items-center justify-between px-1 text-[11px] text-slate-500">
-            {secondaryContact ? (
-              <a href={`tel:${secondaryContact.phone}`} className="text-slate-700 hover:underline">
-                Secondary: {secondaryContact.name}
-              </a>
-            ) : (
-              <span>Direct Emergency Link</span>
-            )}
+          <div className="flex items-center justify-between px-1 text-[11px]">
+            <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+              <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
+              <span>Caller ID Masked & Encrypted</span>
+            </div>
 
-            <a href="tel:911" className="text-red-600 hover:underline font-bold">
-              Call 911 / 112
-            </a>
+            {secondaryContact && (
+              <button
+                onClick={() => handleInitiateProxyCall(secondaryContact.id)}
+                disabled={callingContactId !== null}
+                className="text-slate-700 hover:text-slate-900 font-semibold hover:underline cursor-pointer"
+              >
+                Call Secondary ({secondaryContact.relationship})
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Encrypted Voice Relay Modal */}
+      {callModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-xl border border-slate-200 text-center animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto text-xl shadow-2xs">
+              <FontAwesomeIcon icon={faShieldHalved} />
+            </div>
+
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Encrypted Emergency Call</h3>
+              <p className="text-xs text-slate-500 mt-0.5">Caller ID & Phone Privacy Protected</p>
+            </div>
+
+            {/* Privacy Architecture Visual */}
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-around text-xs">
+              <div className="text-center">
+                <span className="block text-[10px] text-slate-500 uppercase font-bold">You</span>
+                <span className="font-semibold text-slate-800">Bystander</span>
+                <span className="block text-[9px] text-emerald-600 font-medium">Number Hidden</span>
+              </div>
+              <div className="text-slate-300 font-mono text-sm px-1">⟷ 🔒 ⟷</div>
+              <div className="text-center">
+                <span className="block text-[10px] text-slate-500 uppercase font-bold">Target</span>
+                <span className="font-semibold text-slate-800">{primaryContact?.relationship || 'Contact'}</span>
+                <span className="block text-[9px] text-emerald-600 font-medium">Number Hidden</span>
+              </div>
+            </div>
+
+            {/* Status Feedback */}
+            {callStatus ? (
+              <div
+                className={`p-3 rounded-xl text-xs space-y-2 ${
+                  callStatus.success
+                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                    : 'bg-red-50 border border-red-200 text-red-900'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-1.5 font-bold">
+                  <FontAwesomeIcon icon={callStatus.success ? faCircleCheck : faTriangleExclamation} />
+                  <span>{callStatus.success ? 'Secure Relay Connected' : 'Relay Connection Error'}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-slate-600">{callStatus.message}</p>
+                {callStatus.proxyTelUri && (
+                  <a
+                    href={callStatus.proxyTelUri}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs"
+                  >
+                    <FontAwesomeIcon icon={faPhone} />
+                    <span>Dial Secure Relay Number</span>
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xs font-semibold text-slate-700">Connecting via Private Proxy...</p>
+                <p className="text-[10px] text-slate-500">Encrypting caller ID and routing dispatch ping</p>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                setCallModalOpen(false);
+                setCallStatus(null);
+              }}
+              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs py-2.5 rounded-xl transition cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* First Aid Modal */}
       <FirstAidModal

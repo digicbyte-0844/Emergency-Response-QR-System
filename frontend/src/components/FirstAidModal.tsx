@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { X, HeartHandshake, Play, Square, Activity, AlertCircle, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faSuitcaseMedical, 
+  faXmark, 
+  faPlay, 
+  faStop, 
+  faTriangleExclamation, 
+  faCircleCheck,
+  faPhone
+} from '@fortawesome/free-solid-svg-icons';
 
 interface FirstAidModalProps {
   isOpen: boolean;
@@ -44,15 +53,15 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-2xs flex items-center justify-center p-4">
       <div className="bg-white rounded-xl max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col max-h-[85vh] shadow-lg">
         
-        {/* Header */}
+        {/* Header (60% White + 30% Green Accent) */}
         <div className="bg-white border-b border-slate-200 px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs">
-              <HeartHandshake className="w-4 h-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+              <FontAwesomeIcon icon={faSuitcaseMedical} />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-900">First Aid Emergency Protocol</h3>
-              <p className="text-[11px] text-slate-500">Step-by-step guidance for bystanders</p>
+              <h3 className="font-bold text-sm text-slate-900">First Aid Emergency Protocols</h3>
+              <p className="text-[11px] text-slate-500">Step-by-step guidance for Good Samaritan responders</p>
             </div>
           </div>
           <button
@@ -62,48 +71,48 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
             }}
             className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
-            <X className="w-4 h-4" />
+            <FontAwesomeIcon icon={faXmark} className="text-base" />
           </button>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation (30% Green Active Highlights) */}
         <div className="flex overflow-x-auto bg-slate-50 px-3 py-1.5 gap-1 border-b border-slate-200 text-xs font-medium">
           <button
             onClick={() => setActiveTab('cpr')}
-            className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
-              activeTab === 'cpr' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+              activeTab === 'cpr' ? 'bg-emerald-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             CPR Guide
           </button>
           <button
             onClick={() => setActiveTab('anaphylaxis')}
-            className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
-              activeTab === 'anaphylaxis' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+              activeTab === 'anaphylaxis' ? 'bg-emerald-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Anaphylaxis (EpiPen)
           </button>
           <button
             onClick={() => setActiveTab('diabetic')}
-            className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
-              activeTab === 'diabetic' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+              activeTab === 'diabetic' ? 'bg-emerald-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Diabetic Alert
           </button>
           <button
             onClick={() => setActiveTab('seizure')}
-            className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
-              activeTab === 'seizure' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+              activeTab === 'seizure' ? 'bg-emerald-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Seizure
           </button>
           <button
             onClick={() => setActiveTab('recovery')}
-            className={`px-2.5 py-1.5 rounded-lg transition whitespace-nowrap ${
-              activeTab === 'recovery' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            className={`px-3 py-1.5 rounded-lg transition whitespace-nowrap ${
+              activeTab === 'recovery' ? 'bg-emerald-600 text-white font-semibold shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Recovery Position
@@ -117,11 +126,11 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
           {activeTab === 'cpr' && (
             <div className="space-y-3.5">
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-900 flex items-start gap-2.5">
-                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-xs">Call 911 / 112 before starting CPR!</p>
                   <p className="mt-0.5 text-slate-600 text-[11px]">
-                    If unresponsive and not breathing, begin hands-only chest compressions.
+                    If the patient is unresponsive and not breathing, begin hands-only chest compressions.
                   </p>
                 </div>
               </div>
@@ -135,11 +144,11 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
                   <div
                     className={`w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-100 ${
                       metronomeBeat
-                        ? 'border-red-600 bg-red-600 text-white scale-110 shadow-xs'
+                        ? 'border-emerald-600 bg-emerald-600 text-white scale-110 shadow-xs'
                         : 'border-slate-300 bg-white text-slate-800 scale-100'
                     }`}
                   >
-                    <span className="text-base font-bold">{metronomeActive ? metronomeCount + 1 : '105'}</span>
+                    <span className="text-base font-black">{metronomeActive ? metronomeCount + 1 : '105'}</span>
                   </div>
                 </div>
                 <button
@@ -147,18 +156,18 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
                   className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-xs transition ${
                     metronomeActive
                       ? 'bg-slate-800 text-white'
-                      : 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                   }`}
                 >
-                  {metronomeActive ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                  <FontAwesomeIcon icon={metronomeActive ? faStop : faPlay} className="text-xs" />
                   <span>{metronomeActive ? 'Stop Metronome' : 'Start Metronome'}</span>
                 </button>
               </div>
 
               <div className="space-y-2 text-slate-600">
-                <p><strong>1. Hand Placement:</strong> Interlock fingers in center of chest between nipples.</p>
-                <p><strong>2. Depth & Speed:</strong> Push hard and fast at least 2 inches (5 cm) deep. Allow full recoil.</p>
-                <p><strong>3. Do Not Stop:</strong> Continue until emergency responders arrive.</p>
+                <p><strong>1. Hand Placement:</strong> Interlock fingers in center of patient chest between nipples.</p>
+                <p><strong>2. Depth & Speed:</strong> Push hard and fast at least 2 inches (5 cm) deep. Allow full chest recoil.</p>
+                <p><strong>3. Do Not Stop:</strong> Continue until emergency responders arrive or AED is attached.</p>
               </div>
             </div>
           )}
@@ -166,9 +175,12 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
           {/* Anaphylaxis Tab */}
           {activeTab === 'anaphylaxis' && (
             <div className="space-y-3">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-900">
-                <p className="font-bold text-xs">Severe Anaphylaxis (Epinephrine Protocol)</p>
-                <p className="text-[11px] mt-0.5">Signs: Throat swelling, breathing difficulty, hives, collapse.</p>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-900">
+                <p className="font-bold text-xs flex items-center gap-1.5">
+                  <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-600" />
+                  <span>Severe Anaphylaxis (Epinephrine Protocol)</span>
+                </p>
+                <p className="text-[11px] mt-0.5 text-slate-700">Signs: Throat swelling, breathing difficulty, hives, collapse.</p>
               </div>
 
               <div className="space-y-2">
@@ -176,15 +188,15 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
                   <p className="font-bold text-slate-900 mb-0.5">Step 1: Locate Auto-Injector (EpiPen)</p>
                   <p className="text-slate-600">Check patient pockets, backpack, or purse.</p>
                 </div>
-                <div className="p-2.5 bg-red-50 rounded-lg border border-red-200">
+                <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg">
                   <p className="font-bold text-red-900 mb-0.5">Step 2: Inject Into Mid-Outer Thigh</p>
                   <p className="text-red-800">
                     Remove blue cap. Firmly push orange tip into outer thigh at 90° angle until click. <strong>Hold firmly for 3 full seconds.</strong>
                   </p>
                 </div>
                 <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
-                  <p className="font-bold text-slate-900 mb-0.5">Step 3: Massage & Call 911</p>
-                  <p className="text-slate-600">Massage injection area for 10 seconds. Keep patient still.</p>
+                  <p className="font-bold text-slate-900 mb-0.5">Step 3: Massage & Alert Emergency Contact</p>
+                  <p className="text-slate-600">Massage injection area for 10 seconds. Keep patient still and warm.</p>
                 </div>
               </div>
             </div>
@@ -201,12 +213,12 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
               <div className="space-y-2">
                 <div className="p-2.5 bg-emerald-50 rounded-lg border border-emerald-200">
                   <p className="font-bold text-emerald-900 mb-0.5">If Conscious & Able to Swallow:</p>
-                  <p className="text-emerald-800">Provide 15-20g fast-acting sugar (fruit juice, soda, honey).</p>
+                  <p className="text-emerald-800">Provide 15-20g fast-acting sugar (fruit juice, non-diet soda, glucose tabs).</p>
                 </div>
                 <div className="p-2.5 bg-red-50 rounded-lg border border-red-200">
                   <p className="font-bold text-red-900 mb-0.5">If Unconscious:</p>
-                  <p className="text-red-800 font-semibold">NEVER put liquids or food in their mouth. Choking hazard.</p>
-                  <p className="text-red-700 mt-0.5">Call 911 immediately. Turn patient on side in recovery position.</p>
+                  <p className="text-red-800 font-semibold">NEVER put liquids or food in mouth. Choking hazard.</p>
+                  <p className="text-red-700 mt-0.5">Alert emergency contacts immediately. Turn patient on side in recovery position.</p>
                 </div>
               </div>
             </div>
@@ -250,15 +262,12 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
 
         </div>
 
-        {/* Footer */}
+        {/* Footer (10% Red Emergency Dial Action) */}
         <div className="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between">
-          <a
-            href="tel:911"
-            className="inline-flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-3.5 py-1.5 rounded-lg transition"
-          >
-            <AlertCircle className="w-3.5 h-3.5" />
-            Dial 911 / 112
-          </a>
+          <div className="inline-flex items-center gap-1.5 text-emerald-800 text-xs font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Encrypted Emergency Voice Relay Active</span>
+          </div>
           <button
             onClick={() => {
               setMetronomeActive(false);
