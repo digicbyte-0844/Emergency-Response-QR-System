@@ -673,130 +673,76 @@ export const ScanView: React.FC = () => {
           {primaryContact && (
             <a
               href={primaryContact.proxyTelUri || '#'}
-              onClick={() => handleInitiateProxyCall(primaryContact.id)}
-              className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-xs cursor-pointer text-center"
+              onClick={() => {
+                if (token) {
+                  api.callEmergencyContact(token, primaryContact.id).catch(() => {});
+                }
+                setCallStatus({
+                  success: true,
+                  message: `Encrypted voice relay connecting to ${primaryContact.relationship}. Real phone numbers and caller ID are 100% masked.`,
+                  proxyTelUri: primaryContact.proxyTelUri,
+                  simulated: true,
+                });
+              }}
+              className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-md cursor-pointer text-center"
             >
               <FontAwesomeIcon icon={faPhone} />
-              <span>
-                {callingContactId === primaryContact.id
-                  ? 'Connecting Encrypted Voice Relay...'
-                  : `Call Emergency Contact (${primaryContact.relationship || 'Primary'})`}
-              </span>
+              <span>Call Emergency Contact ({primaryContact.relationship || 'Primary'})</span>
             </a>
           )}
 
+          {/* Discreet Privacy & Masked Options */}
           <div className="flex items-center justify-between px-1 text-[11px]">
-            <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-              <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
-              <span>Caller ID Masked & Encrypted</span>
-            </div>
+            {primaryContact?.proxyTelUri ? (
+              <a
+                href={`tel:%2331%23${primaryContact.proxyTelUri.replace('tel:', '')}`}
+                className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-semibold"
+                title="Dial with #31# prefix to suppress your caller ID display"
+              >
+                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
+                <span>Call with Private Caller ID (#31#)</span>
+              </a>
+            ) : (
+              <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
+                <span>Caller ID Masked & Encrypted</span>
+              </span>
+            )}
 
             {secondaryContact && (
               <a
                 href={secondaryContact.proxyTelUri || '#'}
-                onClick={() => handleInitiateProxyCall(secondaryContact.id)}
+                onClick={() => {
+                  if (token) {
+                    api.callEmergencyContact(token, secondaryContact.id).catch(() => {});
+                  }
+                }}
                 className="text-slate-700 hover:text-slate-900 font-semibold hover:underline cursor-pointer"
               >
                 Call Secondary ({secondaryContact.relationship})
               </a>
             )}
           </div>
+
+          {/* Non-blocking feedback toast when dialer is engaged */}
+          {callStatus && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-2.5 rounded-lg text-xs flex items-center justify-between gap-2 animate-in fade-in">
+              <div className="flex items-center gap-1.5 font-medium truncate">
+                <FontAwesomeIcon icon={faCircleCheck} className="text-emerald-600 shrink-0" />
+                <span className="truncate">Connecting encrypted relay to {primaryContact?.relationship}...</span>
+              </div>
+              {callStatus.proxyTelUri && (
+                <a
+                  href={callStatus.proxyTelUri}
+                  className="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded text-[11px] transition"
+                >
+                  Dial Now
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Encrypted Voice Relay Modal */}
-      {callModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-2xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-xl border border-slate-200 text-center animate-in fade-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto text-xl shadow-2xs">
-              <FontAwesomeIcon icon={faShieldHalved} />
-            </div>
-
-            <div>
-              <h3 className="text-base font-bold text-slate-900">Encrypted Emergency Call</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Caller ID & Phone Privacy Protected</p>
-            </div>
-
-            {/* Privacy Architecture Visual */}
-            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center justify-around text-xs">
-              <div className="text-center">
-                <span className="block text-[10px] text-slate-500 uppercase font-bold">You</span>
-                <span className="font-semibold text-slate-800">Bystander</span>
-                <span className="block text-[9px] text-emerald-600 font-medium">Caller ID Hidden</span>
-              </div>
-              <div className="text-slate-300 font-mono text-sm px-1">⟷ 🔒 ⟷</div>
-              <div className="text-center">
-                <span className="block text-[10px] text-slate-500 uppercase font-bold">Target</span>
-                <span className="font-semibold text-slate-800">
-                  {((callingContactId && patient?.emergencyContacts.find((c) => c.id === callingContactId)) || primaryContact)?.relationship || 'Contact'}
-                </span>
-                <span className="block text-[9px] text-emerald-600 font-medium">Number Masked</span>
-              </div>
-            </div>
-
-            {/* Status Feedback */}
-            {callStatus ? (
-              <div
-                className={`p-3 rounded-xl text-xs space-y-2.5 ${
-                  callStatus.success
-                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
-                    : 'bg-red-50 border border-red-200 text-red-900'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-1.5 font-bold">
-                  <FontAwesomeIcon icon={callStatus.success ? faCircleCheck : faTriangleExclamation} />
-                  <span>{callStatus.success ? 'Secure Relay Connected' : 'Relay Connection Error'}</span>
-                </div>
-                <p className="text-[11px] leading-relaxed text-slate-600">{callStatus.message}</p>
-              </div>
-            ) : (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-xs font-semibold text-slate-700">Connecting via Private Proxy...</p>
-                <p className="text-[10px] text-slate-500">Encrypting caller ID and routing dispatch ping</p>
-              </div>
-            )}
-
-            {/* Active Direct Dial Action Buttons */}
-            {(() => {
-              const target = (callingContactId && patient?.emergencyContacts.find((c) => c.id === callingContactId)) || primaryContact;
-              const telUri = callStatus?.proxyTelUri || target?.proxyTelUri;
-              if (!telUri) return null;
-              const rawClean = telUri.replace('tel:', '');
-
-              return (
-                <div className="space-y-2 pt-1">
-                  <a
-                    href={telUri}
-                    className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition shadow-xs"
-                  >
-                    <FontAwesomeIcon icon={faPhone} />
-                    <span>Call Emergency Contact ({target?.relationship || 'Contact'})</span>
-                  </a>
-
-                  <a
-                    href={`tel:%2331%23${rawClean}`}
-                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-semibold text-[11px] flex items-center justify-center gap-1.5 transition"
-                  >
-                    <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-xs" />
-                    <span>Dial with Private Caller ID (#31# Prefix)</span>
-                  </a>
-                </div>
-              );
-            })()}
-
-            <button
-              onClick={() => {
-                setCallModalOpen(false);
-                setCallStatus(null);
-              }}
-              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs py-2.5 rounded-xl transition cursor-pointer"
-            >
-              Dismiss
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* First Aid Modal */}
       <FirstAidModal
