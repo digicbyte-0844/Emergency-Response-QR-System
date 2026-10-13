@@ -193,8 +193,6 @@ app.get('/api/scan/:token', async (req: Request, res: Response) => {
       isUnlocked: !isProtected,
       emergencyContacts: (profile.emergencyContacts || []).map((contact) => ({
         id: contact.id,
-        name: contact.name,
-        phone: contact.phone,
         relationship: contact.relationship || 'Emergency Contact',
         isPrimary: contact.isPrimary,
         hasProxyRelay: true,
@@ -253,8 +251,6 @@ app.post('/api/scan/:token/verify-pin', async (req: Request, res: Response) => {
         isUnlocked: true,
         emergencyContacts: (profile.emergencyContacts || []).map((contact) => ({
           id: contact.id,
-          name: contact.name,
-          phone: contact.phone,
           relationship: contact.relationship || 'Emergency Contact',
           isPrimary: contact.isPrimary,
           hasProxyRelay: true,
