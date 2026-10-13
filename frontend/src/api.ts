@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MedicalProfile, PublicEmergencyProfile, HospitalFacility, LocationAlertResponse, ProxyCallResponse } from './types';
+import { MedicalProfile, PublicEmergencyProfile, HospitalFacility, LocationAlertResponse, ProxyCallResponse, AgoraVoiceTokenData } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
@@ -55,6 +55,11 @@ export const api = {
 
   async callEmergencyContact(token: string, contactId?: string): Promise<ProxyCallResponse> {
     const res = await client.post(`/api/scan/${token}/call-contact`, { contactId });
+    return res.data;
+  },
+
+  async getAgoraVoiceToken(token: string, role: 'bystander' | 'contact' = 'bystander'): Promise<AgoraVoiceTokenData> {
+    const res = await client.post(`/api/scan/${token}/agora-token`, { role });
     return res.data;
   },
 

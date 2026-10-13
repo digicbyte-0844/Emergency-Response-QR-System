@@ -65,6 +65,21 @@ export interface ProxyCallResponse {
   simulated: boolean;
 }
 
+export interface AgoraVoiceTokenData {
+  success: boolean;
+  appId: string;
+  channelName: string;
+  token: string;
+  uid: number;
+  expireTime: number;
+  role: 'bystander' | 'contact';
+  patientName: string;
+  bloodType: BloodType;
+  allergies: string[];
+  relationship: string;
+  callUrl: string;
+}
+
 export interface HospitalFacility {
   id: string | number;
   name: string;

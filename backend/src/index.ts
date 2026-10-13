@@ -5,6 +5,7 @@ import { encryptId, decryptId, isValidToken } from './utils/crypto';
 import { createStorageService } from './services/storage';
 import { NotificationService } from './services/notifications';
 import { HospitalService } from './services/hospitals';
+import { AgoraVoiceService } from './services/agora';
 import { PublicEmergencyProfile } from './types';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.json());
 const storage = createStorageService();
 const notifications = new NotificationService();
 const hospitals = new HospitalService();
+const agora = new AgoraVoiceService();
 
 // Favicon handler to prevent browser 404 console warnings
 app.get('/favicon.ico', (req: Request, res: Response) => {
@@ -331,6 +333,43 @@ app.post('/api/scan/:token/call-contact', async (req: Request, res: Response) =>
   } catch (err: any) {
     console.error('Error initiating encrypted proxy call:', err);
     res.status(500).json({ error: 'Failed to initiate proxy call', details: err.message });
+  }
+});
+
+// -------------------------------------------------------------
+// 6c. Agora Encrypted WebRTC Voice Token (Zero Phone Numbers Exchanged)
+// -------------------------------------------------------------
+app.post('/api/scan/:token/agora-token', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+    const role = (req.body && req.body.role === 'contact' ? 'contact' : 'bystander') as 'bystander' | 'contact';
+
+    if (!isValidToken(token)) {
+      return res.status(400).json({ error: 'Invalid emergency token' });
+    }
+
+    const profileId = decryptId(token);
+    const profile = await storage.getProfileById(profileId);
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Medical profile not found' });
+    }
+
+    const tokenData = agora.generateVoiceToken(profileId, role);
+    const primaryContact = profile.emergencyContacts.find((c) => c.isPrimary) || profile.emergencyContacts[0];
+
+    res.json({
+      success: true,
+      ...tokenData,
+      patientName: profile.fullName,
+      bloodType: profile.bloodType,
+      allergies: profile.allergies || [],
+      relationship: primaryContact?.relationship || 'Emergency Contact',
+      callUrl: `https://emergency-qr-997c0.web.app/voice-call/${token}`
+    });
+  } catch (err: any) {
+    console.error('Error generating Agora RTC voice token:', err);
+    res.status(500).json({ error: 'Failed to initialize Agora RTC channel', details: err.message });
   }
 });
 

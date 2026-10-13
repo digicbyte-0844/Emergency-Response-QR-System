@@ -6,6 +6,7 @@ import { Home } from './pages/Home';
 import { Dashboard } from './pages/Dashboard';
 import { ScanView } from './pages/ScanView';
 import { CardPreview } from './pages/CardPreview';
+import { VoiceCallView } from './pages/VoiceCallView';
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/scan/:token" element={<ScanView />} />
             <Route path="/card/:token" element={<CardPreview />} />
+            <Route path="/voice-call/:token" element={<VoiceCallView />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
