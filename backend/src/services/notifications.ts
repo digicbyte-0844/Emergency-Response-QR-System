@@ -174,15 +174,16 @@ export class NotificationService {
 
     if (this.twilioClient) {
       try {
-        // Dispatch immediate high-urgency SMS and Voice Ping to the stored contact
-        const alertMsg = `🚨 [URGENT EMERGENCY CALL RELAY] A Good Samaritan bystander has scanned the medical ID for ${profile.fullName} and is requesting an immediate emergency callback! Connecting you via secure relay.`;
-        await this.twilioClient.messages.create({
-          body: alertMsg,
+        const cleanTarget = (target.phone || '').replace(/[^0-9+]/g, '');
+        this.latestRelayTarget = cleanTarget;
+        // Dispatch live outbound emergency call to the contact's phone
+        const call = await this.twilioClient.calls.create({
+          to: cleanTarget,
           from: this.twilioPhone,
-          to: target.phone
+          url: 'https://emergency-response-qr-system.onrender.com/api/voice/incoming'
         });
 
-        console.log(`📲 Dispatched masked call relay ping to private contact for ${profile.fullName}`);
+        console.log(`📲 Dispatched live Twilio call relay ping to contact (${cleanTarget}): Call SID ${call.sid}`);
         return {
           success: true,
           message: `Encrypted voice relay alert dispatched to primary emergency contact (${target.relationship}). Connecting call...`,
@@ -190,7 +191,7 @@ export class NotificationService {
           simulated: false
         };
       } catch (err: any) {
-        console.error('Twilio masked call dispatch error:', err);
+        console.error('Twilio masked call dispatch error:', err.message);
       }
     }
 
