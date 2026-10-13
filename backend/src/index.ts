@@ -24,6 +24,11 @@ const storage = createStorageService();
 const notifications = new NotificationService();
 const hospitals = new HospitalService();
 
+// Favicon handler to prevent browser 404 console warnings
+app.get('/favicon.ico', (req: Request, res: Response) => {
+  res.status(204).end();
+});
+
 // -------------------------------------------------------------
 // Root Status Page
 // -------------------------------------------------------------
