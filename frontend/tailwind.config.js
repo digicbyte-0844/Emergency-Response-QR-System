@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        emergency: {
+        brand: {
           50: '#fef2f2',
           100: '#fee2e2',
           200: '#fecaca',
@@ -16,11 +16,11 @@ export default {
           700: '#b91c1c',
           800: '#991b1b',
           900: '#7f1d1d',
-        }
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-      }
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],
