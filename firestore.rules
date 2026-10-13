@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only the backend Admin SDK (or authenticated administrators) can access records directly.
+    // Public users access safely filtered records via the encrypted API endpoints.
+    match /users/{userId} {
+      allow read, write: if false; // All operations route through the backend AES encryption API
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

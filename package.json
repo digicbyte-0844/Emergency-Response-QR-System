@@ -1,0 +1,26 @@
+{
+  "name": "emergency-response-qr-system",
+  "version": "1.0.0",
+  "description": "Full-stack Emergency Response QR System with encrypted medical ID, 3-second bystander triage, live GPS dispatch, and hospital locator.",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "test": "npm --prefix backend test",
+    "test:firebase": "npm --prefix backend run test:firebase",
+    "deploy:frontend": "npm --prefix frontend run build && npx firebase deploy --only hosting",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "start": "node -e \"const { spawn } = require('child_process'); const b = spawn('npm', ['--prefix', 'backend', 'run', 'dev'], { stdio: 'inherit', shell: true }); const f = spawn('npm', ['--prefix', 'frontend', 'run', 'dev'], { stdio: 'inherit', shell: true }); process.on('SIGINT', () => { b.kill(); f.kill(); process.exit(); });\""
+  },
+  "keywords": [
+    "emergency-response",
+    "medical-id",
+    "qr-code",
+    "aes-256",
+    "twilio",
+    "leaflet",
+    "triage"
+  ],
+  "author": "ResQQR Team",
+  "license": "MIT"
+}

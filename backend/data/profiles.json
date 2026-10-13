@@ -1,0 +1,204 @@
+[
+  {
+    "id": "demo-sarah-chen",
+    "fullName": "Sarah Chen",
+    "dateOfBirth": "1998-05-14",
+    "age": 28,
+    "gender": "Female",
+    "bloodType": "A-",
+    "allergies": [
+      "Peanuts (Severe / Anaphylaxis)",
+      "Tree Nuts",
+      "Sulfa Drugs"
+    ],
+    "chronicConditions": [
+      "Exercise-Induced Asthma"
+    ],
+    "medications": [
+      "EpiPen (Autoinjector)",
+      "Albuterol Inhaler (PRN)"
+    ],
+    "organDonor": true,
+    "resuscitationStatus": "Full Code",
+    "emergencyContacts": [
+      {
+        "id": "c1",
+        "name": "David Chen",
+        "relationship": "Spouse",
+        "phone": "+1 (555) 234-5678",
+        "email": "david.chen@example.com",
+        "isPrimary": true
+      },
+      {
+        "id": "c2",
+        "name": "Dr. Helen Vance",
+        "relationship": "Pulmonologist",
+        "phone": "+1 (555) 876-5432",
+        "isPrimary": false
+      }
+    ],
+    "primaryDoctor": {
+      "name": "Dr. Helen Vance",
+      "phone": "+1 (555) 876-5432",
+      "clinic": "Metro Pulmonary Care"
+    },
+    "preferredHospital": "City General Medical Center",
+    "criticalNotes": "CRITICAL: Severe peanut allergy. If unresponsive or struggling to breathe, immediately administer EpiPen located in outer jacket pocket or purse. Call 911 immediately.",
+    "language": "English, Mandarin",
+    "createdAt": "2026-10-13T07:24:27.012Z",
+    "updatedAt": "2026-10-13T07:24:27.013Z"
+  },
+  {
+    "id": "demo-alex-rivera",
+    "fullName": "Alex Rivera",
+    "dateOfBirth": "1992-11-20",
+    "age": 34,
+    "gender": "Male",
+    "bloodType": "O+",
+    "allergies": [
+      "Penicillin",
+      "Codeine"
+    ],
+    "chronicConditions": [
+      "Type 1 Diabetes Mellitus",
+      "Celiac Disease"
+    ],
+    "medications": [
+      "Insulin Glargine (Lantus)",
+      "Insulin Lispro (Humalog)",
+      "Glucagon Emergency Kit"
+    ],
+    "organDonor": true,
+    "resuscitationStatus": "Full Code",
+    "emergencyContacts": [
+      {
+        "id": "c3",
+        "name": "Elena Rivera",
+        "relationship": "Sister",
+        "phone": "+1 (555) 912-3456",
+        "email": "elena.rivera@example.com",
+        "isPrimary": true
+      },
+      {
+        "id": "c4",
+        "name": "Marcus Bell",
+        "relationship": "Roommate / Colleague",
+        "phone": "+1 (555) 432-1098",
+        "isPrimary": false
+      }
+    ],
+    "primaryDoctor": {
+      "name": "Dr. Robert Torres",
+      "phone": "+1 (555) 345-6789",
+      "clinic": "Endocrine Specialists Clinic"
+    },
+    "preferredHospital": "St. Jude Memorial Hospital",
+    "criticalNotes": "Diabetic alert: If confused, sweating profusely, or unconscious, suspect severe hypoglycemia. Do NOT give oral liquids if unconscious. Administer Nasal Baqsimi or Glucagon.",
+    "language": "English, Spanish",
+    "createdAt": "2026-10-13T07:24:27.013Z",
+    "updatedAt": "2026-10-13T07:24:27.013Z"
+  },
+  {
+    "id": "demo-robert-miller",
+    "fullName": "Robert Miller",
+    "dateOfBirth": "1961-03-08",
+    "age": 65,
+    "gender": "Male",
+    "bloodType": "B+",
+    "allergies": [
+      "Aspirin",
+      "Iodinated Contrast Dye"
+    ],
+    "chronicConditions": [
+      "Coronary Artery Disease (CAD)",
+      "Atrial Fibrillation",
+      "Hypertension"
+    ],
+    "medications": [
+      "Warfarin (Coumadin - Blood Thinner)",
+      "Metoprolol",
+      "Lisinopril"
+    ],
+    "organDonor": false,
+    "resuscitationStatus": "Full Code",
+    "emergencyContacts": [
+      {
+        "id": "c5",
+        "name": "Martha Miller",
+        "relationship": "Wife",
+        "phone": "+1 (555) 789-0123",
+        "email": "martha.miller@example.com",
+        "isPrimary": true
+      }
+    ],
+    "primaryDoctor": {
+      "name": "Dr. Alan Grant",
+      "phone": "+1 (555) 654-3210",
+      "clinic": "Heart & Vascular Institute"
+    },
+    "preferredHospital": "University Hospital Cardiac Center",
+    "criticalNotes": "Patient has an implanted cardiac pacemaker (Medtronic 2023) and is on anticoagulants (high risk of internal hemorrhage on traumatic impact). Carry medical alert card.",
+    "language": "English",
+    "createdAt": "2026-10-13T07:24:27.013Z",
+    "updatedAt": "2026-10-13T07:24:27.013Z"
+  },
+  {
+    "id": "user_34b184ace6d6",
+    "fullName": "Elena Rostova",
+    "bloodType": "B+",
+    "allergies": [
+      "Aspirin"
+    ],
+    "chronicConditions": [
+      "Asthma"
+    ],
+    "medications": [
+      "Albuterol"
+    ],
+    "organDonor": false,
+    "resuscitationStatus": "Full Code",
+    "emergencyContacts": [
+      {
+        "isPrimary": true,
+        "name": "Igor Rostov",
+        "id": "c1",
+        "phone": "+15551234567",
+        "relationship": "Brother"
+      }
+    ],
+    "criticalNotes": "",
+    "language": "English",
+    "createdAt": "2026-10-13T07:55:41.068Z",
+    "updatedAt": "2026-10-13T07:55:41.068Z"
+  },
+  {
+    "id": "user_2e3cb03fd30d",
+    "fullName": "Elena Rostova",
+    "bloodType": "B+",
+    "allergies": [
+      "Aspirin"
+    ],
+    "chronicConditions": [
+      "Asthma"
+    ],
+    "medications": [
+      "Albuterol"
+    ],
+    "organDonor": false,
+    "resuscitationStatus": "Full Code",
+    "emergencyContacts": [
+      {
+        "isPrimary": true,
+        "name": "Igor Rostov",
+        "id": "c1",
+        "phone": "+15551234567",
+        "relationship": "Brother"
+      }
+    ],
+    "criticalNotes": "",
+    "language": "English",
+    "privacyPin": "9988",
+    "createdAt": "2026-10-13T07:56:28.308Z",
+    "updatedAt": "2026-10-13T07:56:28.308Z"
+  }
+]
