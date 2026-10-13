@@ -671,60 +671,25 @@ export const ScanView: React.FC = () => {
 
       </div>
 
-      {/* Sticky Bottom Calling Bar - Direct Emergency Call & Encrypted Relay */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-3 shadow-lg z-40 max-w-md mx-auto">
-        <div className="space-y-2">
-          {/* 1. PRIMARY ACTION: Direct Cellular Phone Call (Rings the actual phone immediately) */}
-          {primaryContact?.proxyTelUri && (
-            <a
-              href={primaryContact.proxyTelUri}
-              onClick={() => {
-                if (token) api.callEmergencyContact(token, primaryContact.id).catch(() => {});
-              }}
-              className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3.5 px-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition shadow-md cursor-pointer text-center"
-            >
-              <FontAwesomeIcon icon={faPhone} />
-              <span>Call Emergency Contact ({primaryContact.relationship || 'Primary'})</span>
-            </a>
-          )}
-
-          {/* Privacy & Alternate Options */}
-          <div className="flex items-center justify-between px-1 text-[11px]">
-            {primaryContact?.proxyTelUri ? (
-              <a
-                href={`tel:%2331%23${primaryContact.proxyTelUri.replace('tel:', '')}`}
-                className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-semibold"
-                title="Dial with #31# prefix to conceal caller ID on the recipient's phone"
-              >
-                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
-                <span>Call with Private Caller ID (#31#)</span>
-              </a>
-            ) : (
-              <span className="flex items-center gap-1 text-emerald-700 font-semibold">
-                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-600 text-[10px]" />
-                <span>Caller ID Masked & Encrypted</span>
-              </span>
-            )}
-
-            {secondaryContact?.proxyTelUri && (
-              <a
-                href={secondaryContact.proxyTelUri}
-                onClick={() => {
-                  if (token) api.callEmergencyContact(token, secondaryContact.id).catch(() => {});
-                }}
-                className="text-slate-700 hover:text-slate-900 font-semibold hover:underline cursor-pointer"
-              >
-                Call Secondary ({secondaryContact.relationship})
-              </a>
-            )}
-          </div>
-
-          <div className="pt-1.5 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
-            <FontAwesomeIcon icon={faLock} className="text-[10px] text-emerald-600" />
-            <span>Private phone numbers are encrypted &amp; never exposed</span>
-          </div>
+      {/* Sticky Bottom Calling Bar - ONLY ONE CLEAN ACTION BUTTON */}
+      {primaryContact?.proxyTelUri && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl z-40 max-w-md mx-auto">
+          <a
+            href={`tel:%2331%23${primaryContact.proxyTelUri.replace('tel:', '')}`}
+            onClick={() => {
+              if (token) api.callEmergencyContact(token, primaryContact.id).catch(() => {});
+            }}
+            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-4 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 shadow-md cursor-pointer text-center text-sm tracking-wide transition active:scale-[0.98]"
+          >
+            <FontAwesomeIcon icon={faPhone} className="text-base" />
+            <span>Call Emergency Contact</span>
+            <span className="text-[11px] bg-red-700 text-white px-2 py-0.5 rounded-md font-semibold ml-1 flex items-center gap-1 border border-red-500/50">
+              <FontAwesomeIcon icon={faShieldHalved} className="text-[10px]" />
+              <span>Masked &amp; Encrypted</span>
+            </span>
+          </a>
         </div>
-      </div>
+      )}
 
       {/* First Aid Modal */}
       <FirstAidModal

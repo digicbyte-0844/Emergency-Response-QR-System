@@ -152,7 +152,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
                     <span>{facility.phone}</span>
                   </a>
                 ) : (
-                  <span className="text-[10px] text-slate-400 font-medium">Emergency Care Desk</span>
+                  <span className="text-[10px] text-slate-400 font-medium">Nearest Medical Facility</span>
                 )}
 
                 <a
