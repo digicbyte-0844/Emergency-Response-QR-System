@@ -52,6 +52,8 @@ export interface PublicEmergencyProfile {
   isUnlocked?: boolean;
   emergencyContacts: {
     id: string;
+    name?: string;
+    phone?: string;
     relationship: string;
     isPrimary: boolean;
     hasProxyRelay: boolean;

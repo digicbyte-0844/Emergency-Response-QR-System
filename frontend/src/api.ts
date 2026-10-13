@@ -150,6 +150,8 @@ function toPublicProfile(profile: MedicalProfile, token: string): PublicEmergenc
     isUnlocked: !isProtected,
     emergencyContacts: (profile.emergencyContacts || []).map((c) => ({
       id: c.id,
+      name: c.name,
+      phone: c.phone,
       relationship: c.relationship || 'Emergency Contact',
       isPrimary: c.isPrimary,
       hasProxyRelay: true,

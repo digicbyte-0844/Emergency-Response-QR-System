@@ -518,6 +518,67 @@ export const ScanView: React.FC = () => {
           </>
         )}
 
+        {/* Emergency Contacts Card (60% White / 30% Green) */}
+        {patient.emergencyContacts && patient.emergencyContacts.length > 0 && (
+          <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FontAwesomeIcon icon={faPhone} className="text-emerald-600 text-sm" />
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                  Emergency Contacts
+                </span>
+              </div>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
+                Tap to Call
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {patient.emergencyContacts.map((contact, idx) => {
+                const telTarget = contact.phone
+                  ? `tel:${contact.phone.replace(/[^0-9+]/g, '')}`
+                  : contact.proxyTelUri || 'tel:04041893643';
+
+                return (
+                  <div
+                    key={contact.id || idx}
+                    className="p-3 rounded-lg border border-slate-100 bg-slate-50/70 flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-bold text-slate-900 truncate">
+                          {contact.name || contact.relationship}
+                        </span>
+                        {contact.isPrimary && (
+                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                            Primary
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        {contact.relationship} {contact.phone ? `• ${contact.phone}` : ''}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <a
+                        href={telTarget}
+                        onClick={() => {
+                          if (token) api.callEmergencyContact(token, contact.id).catch(() => {});
+                        }}
+                        className="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-xs py-2 px-3 rounded-lg flex items-center gap-1.5 shadow-xs transition"
+                      >
+                        <FontAwesomeIcon icon={faPhone} className="text-[11px]" />
+                        <span>Call</span>
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Preferred Hospital */}
         {patient.preferredHospital && (
           <div className="bg-white rounded-xl p-3 border border-slate-200 flex items-center justify-between text-xs shadow-xs">
@@ -671,22 +732,32 @@ export const ScanView: React.FC = () => {
 
       </div>
 
-      {/* Sticky Bottom Calling Bar - ONLY ONE CLEAN ACTION BUTTON */}
-      {primaryContact?.proxyTelUri && (
+      {/* Sticky Bottom Calling Bar - DIRECT & RELAY RESILIENT */}
+      {(primaryContact?.phone || primaryContact?.proxyTelUri) && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl z-40 max-w-md mx-auto">
           <a
-            href={primaryContact.proxyTelUri}
+            href={
+              primaryContact.phone
+                ? `tel:${primaryContact.phone.replace(/[^0-9+]/g, '')}`
+                : primaryContact.proxyTelUri || 'tel:04041893643'
+            }
             onClick={() => {
               if (token) api.callEmergencyContact(token, primaryContact.id).catch(() => {});
             }}
-            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-4 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 shadow-md cursor-pointer text-center text-sm tracking-wide transition active:scale-[0.98]"
+            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3.5 px-4 rounded-xl font-bold flex items-center justify-center gap-2.5 shadow-md cursor-pointer text-center text-sm tracking-wide transition active:scale-[0.98]"
           >
             <FontAwesomeIcon icon={faPhone} className="text-base" />
-            <span>Call Emergency Contact</span>
-            <span className="text-[11px] bg-red-700 text-white px-2 py-0.5 rounded-md font-semibold ml-1 flex items-center gap-1 border border-red-500/50">
-              <FontAwesomeIcon icon={faShieldHalved} className="text-[10px]" />
-              <span>Masked &amp; Encrypted</span>
-            </span>
+            <span>Call {primaryContact.name || 'Emergency Contact'}</span>
+            {primaryContact.phone ? (
+              <span className="text-[11px] bg-red-700 text-white px-2 py-0.5 rounded-md font-semibold ml-1">
+                {primaryContact.relationship}
+              </span>
+            ) : (
+              <span className="text-[11px] bg-red-700 text-white px-2 py-0.5 rounded-md font-semibold ml-1 flex items-center gap-1 border border-red-500/50">
+                <FontAwesomeIcon icon={faShieldHalved} className="text-[10px]" />
+                <span>Masked &amp; Encrypted</span>
+              </span>
+            )}
           </a>
         </div>
       )}
