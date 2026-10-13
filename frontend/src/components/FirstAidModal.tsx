@@ -128,7 +128,7 @@ export const FirstAidModal: React.FC<FirstAidModalProps> = ({
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-900 flex items-start gap-2.5">
                 <FontAwesomeIcon icon={faTriangleExclamation} className="text-red-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-bold text-xs">Call 911 / 112 before starting CPR!</p>
+                  <p className="font-bold text-xs">Alert emergency contacts immediately before starting CPR!</p>
                   <p className="mt-0.5 text-slate-600 text-[11px]">
                     If the patient is unresponsive and not breathing, begin hands-only chest compressions.
                   </p>
