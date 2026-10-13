@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc2626'><path d='M12 2L2 22h20L12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z'/></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#dc2626" />
+    <meta name="theme-color" content="#059669" />
     <title>Emergency Medical QR Response</title>
     <!-- Leaflet CSS -->
     <link
@@ -17,14 +17,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192.svg" />
+    <script>
+      // Self-healing: if an outdated script fails to load due to stale cache, clear and reload once
+      window.addEventListener('error', function (e) {
+        var msg = (e && e.message) || '';
+        if (msg.indexOf('Failed to load module script') !== -1 || msg.indexOf('MIME type') !== -1) {
+          if (!sessionStorage.getItem('reloaded_for_chunk_error')) {
+            sessionStorage.setItem('reloaded_for_chunk_error', '1');
+            if ('caches' in window) {
+              caches.keys().then(function (keys) {
+                return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+              }).then(function () {
+                window.location.reload();
+              });
+            } else {
+              window.location.reload();
+            }
+          }
+        }
+      });
+    </script>
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-red-500 selection:text-white">
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-emerald-600 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').then(function (registration) {
+            registration.update();
+          }).catch(function () {});
         });
       }
     </script>

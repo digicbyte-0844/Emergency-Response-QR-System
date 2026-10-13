@@ -1,7 +1,5 @@
-const CACHE_NAME = 'resqqr-cache-v1';
+const CACHE_NAME = 'resqqr-cache-v2';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/icon-192.svg',
   '/icon-512.svg'
@@ -30,8 +28,31 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // For API scan requests, use Network First, then fallback to Cache
-  if (url.pathname.startsWith('/api/scan/')) {
+  // 1. For HTML and page navigation: NETWORK FIRST, Cache only if offline
+  if (
+    event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('.html')
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => cached || caches.match('/index.html'));
+        })
+    );
+    return;
+  }
+
+  // 2. For API requests: Network First, fallback to cache
+  if (url.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -48,18 +69,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For static assets, use Cache First, then Network
+  // 3. For JavaScript chunks and CSS assets: Cache First, but verify Content-Type!
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return (
-        cached ||
-        fetch(event.request).catch(() => {
-          // If offline and requesting page navigation, serve index.html
-          if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-        })
-      );
+      if (cached) {
+        return cached;
+      }
+
+      return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200) {
+          return response;
+        }
+
+        // Prevent caching HTML rewrite pages as scripts
+        const contentType = response.headers.get('content-type') || '';
+        const isScript = event.request.destination === 'script' || url.pathname.endsWith('.js');
+        if (isScript && contentType.includes('text/html')) {
+          // Do not cache HTML as script
+          return response;
+        }
+
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        return response;
+      });
     })
   );
 });
