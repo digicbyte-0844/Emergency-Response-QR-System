@@ -143,7 +143,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
               </div>
 
               <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between">
-                {facility.phone ? (
+                {facility.phone && !['911', '112', '999', '100', '108'].includes(facility.phone.replace(/\D/g, '')) && !facility.phone.includes('911') && !facility.phone.includes('112') ? (
                   <a
                     href={`tel:${facility.phone}`}
                     className="text-[11px] font-medium text-slate-600 hover:text-emerald-700 inline-flex items-center gap-1.5"
@@ -152,7 +152,7 @@ export const HospitalMap: React.FC<HospitalMapProps> = ({
                     <span>{facility.phone}</span>
                   </a>
                 ) : (
-                  <span className="text-[10px] text-slate-400">Emergency Unit</span>
+                  <span className="text-[10px] text-slate-400 font-medium">Emergency Care Desk</span>
                 )}
 
                 <a

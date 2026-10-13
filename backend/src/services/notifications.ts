@@ -53,7 +53,18 @@ export class NotificationService {
     // Select primary contacts or all if none marked primary
     const targets = profile.emergencyContacts.length > 0
       ? profile.emergencyContacts
-      : [{ id: 'default', name: 'Emergency Services', relationship: 'First Responder', phone: '911', isPrimary: true }];
+      : [];
+
+    if (targets.length === 0) {
+      return {
+        success: false,
+        message: 'No emergency contacts registered for this profile.',
+        timestamp,
+        contactsNotified: 0,
+        googleMapsUrl,
+        simulated: true
+      };
+    }
 
     const alertMessage = 
       `🚨 [EMERGENCY MEDICAL QR ALERT]\n` +

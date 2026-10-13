@@ -6,16 +6,10 @@ import { HospitalMap } from '../components/HospitalMap';
 import { FirstAidModal } from '../components/FirstAidModal';
 import { VoiceAssistant } from '../components/VoiceAssistant';
 import { SupportedLanguage, TRANSLATIONS } from '../utils/translations';
-import { AgoraVoiceManager, VoiceCallState } from '../services/agoraVoice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHeartPulse, 
   faPhone, 
-  faPhoneSlash,
-  faMicrophone,
-  faMicrophoneSlash,
-  faHeadset,
-  faCopy,
   faLocationDot, 
   faTriangleExclamation, 
   faHospital, 
@@ -26,9 +20,9 @@ import {
   faGlobe, 
   faWifi, 
   faCircleCheck,
-  faSuitcaseMedical,
-  faExternalLink,
-  faShieldHalved
+  faSuitcaseMedical, 
+  faExternalLink, 
+  faShieldHalved 
 } from '@fortawesome/free-solid-svg-icons';
 
 export const ScanView: React.FC = () => {
@@ -74,24 +68,7 @@ export const ScanView: React.FC = () => {
   } | null>(null);
   const [callModalOpen, setCallModalOpen] = useState(false);
 
-  // Agora RTC WebRTC Encrypted Voice Call State (Zero phone numbers visible)
-  const [agoraVoiceActive, setAgoraVoiceActive] = useState(false);
-  const [agoraVoiceState, setAgoraVoiceState] = useState<VoiceCallState>('idle');
-  const [agoraRemoteConnected, setAgoraRemoteConnected] = useState(false);
-  const [agoraMuted, setAgoraMuted] = useState(false);
-  const [agoraDuration, setAgoraDuration] = useState(0);
-  const [agoraLinkCopied, setAgoraLinkCopied] = useState(false);
-  const [agoraError, setAgoraError] = useState<string | null>(null);
 
-  const agoraManagerRef = useRef<AgoraVoiceManager | null>(null);
-  const agoraTimerRef = useRef<any>(null);
-
-  useEffect(() => {
-    return () => {
-      if (agoraTimerRef.current) clearInterval(agoraTimerRef.current);
-      if (agoraManagerRef.current) agoraManagerRef.current.endCall();
-    };
-  }, []);
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
@@ -285,67 +262,7 @@ export const ScanView: React.FC = () => {
     }
   };
 
-  // Agora In-Browser WebRTC Voice Call Handlers (Zero phone numbers visible)
-  const handleStartAgoraCall = async () => {
-    if (!token) return;
-    setAgoraVoiceActive(true);
-    setAgoraError(null);
 
-    try {
-      const data = await api.getAgoraVoiceToken(token, 'bystander');
-
-      agoraManagerRef.current = new AgoraVoiceManager({
-        onStateChange: (state) => {
-          setAgoraVoiceState(state);
-          if (state === 'connected') {
-            agoraTimerRef.current = setInterval(() => {
-              setAgoraDuration((prev) => prev + 1);
-            }, 1000);
-          } else if (state === 'idle' || state === 'error') {
-            if (agoraTimerRef.current) clearInterval(agoraTimerRef.current);
-            setAgoraDuration(0);
-            setAgoraRemoteConnected(false);
-            if (state === 'idle') setAgoraVoiceActive(false);
-          }
-        },
-        onRemoteUserJoined: () => {
-          setAgoraRemoteConnected(true);
-        },
-        onRemoteUserLeft: () => {
-          setAgoraRemoteConnected(false);
-        },
-        onError: (err) => {
-          setAgoraError(err.message || 'Agora voice connection error');
-        },
-      });
-
-      await agoraManagerRef.current.startCall({
-        appId: data.appId,
-        channelName: data.channelName,
-        token: data.token,
-        uid: data.uid,
-      });
-
-      // Background alert dispatch
-      api.callEmergencyContact(token).catch(() => {});
-    } catch (err: any) {
-      setAgoraError(err.message || 'Microphone access denied or network error.');
-    }
-  };
-
-  const handleToggleAgoraMute = () => {
-    if (agoraManagerRef.current) {
-      const muted = agoraManagerRef.current.toggleMute();
-      setAgoraMuted(muted);
-    }
-  };
-
-  const handleEndAgoraCall = async () => {
-    if (agoraManagerRef.current) {
-      await agoraManagerRef.current.endCall();
-    }
-    setAgoraVoiceActive(false);
-  };
 
   if (loading) {
     return (
@@ -802,96 +719,12 @@ export const ScanView: React.FC = () => {
             )}
           </div>
 
-          {/* 2. OPTIONAL: In-Browser Web Voice Call via Agora (Zero numbers used) */}
-          <button
-            onClick={handleStartAgoraCall}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-slate-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition border border-slate-700 cursor-pointer text-center"
-          >
-            <FontAwesomeIcon icon={faHeadset} className="text-emerald-400" />
-            <span>Or Start In-Browser WebRTC Voice Call (Agora Audio)</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Floating Live Agora Voice Call Drawer (Zero Phone Numbers Exchanged) */}
-      {agoraVoiceActive && (
-        <div className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white border-t-2 border-emerald-500 p-4 shadow-2xl z-50 max-w-md mx-auto rounded-t-2xl animate-in slide-in-from-bottom duration-200">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="relative">
-                  <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm shadow-md">
-                    <FontAwesomeIcon icon={faHeadset} />
-                  </div>
-                  {agoraVoiceState === 'connected' && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-white leading-tight">
-                    {agoraVoiceState === 'connected'
-                      ? (agoraRemoteConnected ? 'Speaking with Contact' : 'Waiting for Contact to Answer...')
-                      : 'Connecting Encrypted WebRTC...'}
-                  </p>
-                  <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
-                    {agoraVoiceState === 'connected'
-                      ? `Duration: ${Math.floor(agoraDuration / 60).toString().padStart(2, '0')}:${(agoraDuration % 60).toString().padStart(2, '0')}`
-                      : 'Agora RTC Cloud'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Call Controls */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleToggleAgoraMute}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-xs transition ${
-                    agoraMuted ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700'
-                  }`}
-                  title={agoraMuted ? 'Unmute microphone' : 'Mute microphone'}
-                >
-                  <FontAwesomeIcon icon={agoraMuted ? faMicrophoneSlash : faMicrophone} />
-                </button>
-
-                <button
-                  onClick={handleEndAgoraCall}
-                  className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white flex items-center justify-center text-sm transition shadow-md cursor-pointer"
-                  title="Hang Up Voice Call"
-                >
-                  <FontAwesomeIcon icon={faPhoneSlash} />
-                </button>
-              </div>
-            </div>
-
-            {/* Shareable Audio Link for Family */}
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-              <span className="text-slate-400 text-[10px] flex items-center gap-1">
-                <FontAwesomeIcon icon={faShieldHalved} className="text-emerald-400" />
-                Zero phone numbers exchanged
-              </span>
-              <button
-                onClick={() => {
-                  const url = `${window.location.origin}/voice-call/${token}`;
-                  navigator.clipboard.writeText(url);
-                  setAgoraLinkCopied(true);
-                  setTimeout(() => setAgoraLinkCopied(false), 2500);
-                }}
-                className="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-semibold text-[10px] cursor-pointer"
-              >
-                <FontAwesomeIcon icon={agoraLinkCopied ? faCircleCheck : faCopy} />
-                <span>{agoraLinkCopied ? 'Call Link Copied!' : 'Copy Audio Link for Contact'}</span>
-              </button>
-            </div>
-
-            {agoraError && (
-              <p className="text-[10px] text-red-400 bg-red-950/80 p-1.5 rounded border border-red-800/60">
-                {agoraError}
-              </p>
-            )}
+          <div className="pt-1.5 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+            <FontAwesomeIcon icon={faLock} className="text-[10px] text-emerald-600" />
+            <span>Private phone numbers are encrypted &amp; never exposed</span>
           </div>
         </div>
-      )}
+      </div>
 
       {/* First Aid Modal */}
       <FirstAidModal

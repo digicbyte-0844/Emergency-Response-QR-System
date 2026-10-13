@@ -49,7 +49,7 @@ const INITIAL_DEMO_PROFILES: MedicalProfile[] = [
       clinic: 'Metro Pulmonary Care'
     },
     preferredHospital: 'City General Medical Center',
-    criticalNotes: 'CRITICAL: Severe peanut allergy. If unresponsive or struggling to breathe, immediately administer EpiPen located in outer jacket pocket or purse. Call 911 immediately.',
+    criticalNotes: 'CRITICAL: Severe peanut allergy. If unresponsive or struggling to breathe, immediately administer EpiPen located in outer jacket pocket or purse. Call emergency contact immediately.',
     language: 'English, Mandarin',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()

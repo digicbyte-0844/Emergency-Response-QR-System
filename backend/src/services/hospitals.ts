@@ -96,7 +96,7 @@ export class HospitalService {
           lng: lng + 0.012,
           distanceKm: this.calculateDistanceKm(lat, lng, lat + 0.015, lng + 0.012),
           type: 'Hospital / Level 1 Trauma',
-          phone: '911',
+          phone: undefined,
           emergency: true
         },
         {
@@ -106,7 +106,7 @@ export class HospitalService {
           lng: lng + 0.018,
           distanceKm: this.calculateDistanceKm(lat, lng, lat - 0.012, lng + 0.018),
           type: 'Urgent Care / Clinic',
-          phone: '911',
+          phone: undefined,
           emergency: true
         },
         {
@@ -116,7 +116,7 @@ export class HospitalService {
           lng: lng - 0.016,
           distanceKm: this.calculateDistanceKm(lat, lng, lat + 0.022, lng - 0.016),
           type: 'Hospital',
-          phone: '911',
+          phone: undefined,
           emergency: true
         }
       ];
